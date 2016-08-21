@@ -11,20 +11,6 @@ int maxExp2Menor(int N) {
     return (sizeof(N)*8 - __builtin_clz(N) - 1);
 }
 
-// Devuelve la máxima potencia de 2 menor o igual a N
-int maxPot2Menor(int N) {
-    return 1<<maxExp2Menor(N);
-}
-
-// Muestra un vector de vectores por pantalla
-void printMat(vector<vi> &m) {
-    for(auto &v : m) {
-        for(auto &d : v) {
-            cout << d << " ";
-        }cout << endl;
-    }
-}
-
 // Devuelve los índices de los bits en 1 de L
 vi bitsEn1(int L) {
     vi res;
