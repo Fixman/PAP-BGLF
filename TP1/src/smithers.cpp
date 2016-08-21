@@ -44,8 +44,6 @@ int main(){
             cin >> d;
         }
         Matriz matrizResultado(matRes);
-        cout << "Matriz Resultado\n";
-        cout << matrizResultado << endl;
         vm matrices(N);
         for(int i=0; i<N; i++) {
             vi mat(9);
@@ -71,6 +69,7 @@ int main(){
             }
         }
         // Calculamos las productorias de sub-arreglos de largo L 
+        bool hayResultado = false;
         vi bitsL = bitsEn1(L);
         for(int i=0; i<(N-L+1); i++) {
             int idx=i;
@@ -79,9 +78,12 @@ int main(){
                 res *= prods[idx][b];
                 idx += (1<<b);
             }
-            cout << res << endl;
+            hayResultado |= (res == matrizResultado);
         }
-        cout << "===========================================\n";
+        if(hayResultado) 
+            cout << "SI\n";
+        else 
+            cout << "NO\n";
     }
     return 0;
 }
