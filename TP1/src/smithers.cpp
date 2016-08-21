@@ -4,6 +4,7 @@
 using namespace std;
 
 typedef vector<int> vi;
+typedef vector<Matriz> vm;
 
 // Devuelve el máximo K tal que 2^K <= N
 int maxExp2Menor(int N) {
@@ -15,6 +16,7 @@ int maxPot2Menor(int N) {
     return 1<<maxExp2Menor(N);
 }
 
+// Muestra un vector de vectores por pantalla
 void printMat(vector<vi> &m) {
     for(auto &v : m) {
         for(auto &d : v) {
@@ -37,15 +39,26 @@ vi bitsEn1(int L) {
 int main(){
     int N, L;
     while(cin >> N >> L) {
-        vi nums(N);
-        for(auto &d : nums) {
+        vi matRes(9); 
+        for(auto &d : matRes) {
             cin >> d;
         }
+        Matriz matrizResultado(matRes);
+        cout << "Matriz Resultado\n";
+        cout << matrizResultado << endl;
+        vm matrices(N);
+        for(int i=0; i<N; i++) {
+            vi mat(9);
+            for(auto &d : mat) {
+                cin >> d;
+            }
+            matrices[i] = Matriz(mat);
+        }
         int exp = maxExp2Menor(N)+1;
-        vector<vi> prods(N);
+        vector<vm> prods(N);
         // Inicializamos todos los productos con el primer elemento
         for(int i=0; i<N; i++) {
-            prods[i] = vi(exp, nums[i]);
+            prods[i] = vm(exp, matrices[i]);
         }
         // Llenamos la tabla de productorias
         for(int j=1; j<exp; j++) {
@@ -57,18 +70,18 @@ int main(){
                 }
             }
         }
-        printMat(prods);
         // Calculamos las productorias de sub-arreglos de largo L 
         vi bitsL = bitsEn1(L);
         for(int i=0; i<(N-L+1); i++) {
             int idx=i;
-            int res=1;
+            Matriz res = id();
             for(auto b : bitsL) {
                 res *= prods[idx][b];
                 idx += (1<<b);
             }
             cout << res << endl;
         }
+        cout << "===========================================\n";
     }
     return 0;
 }
