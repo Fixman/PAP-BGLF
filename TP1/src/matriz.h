@@ -30,6 +30,7 @@ class Matriz{
 		}
 		Zp operator=(Zp t) {
 			_n = t._n;
+			return (*this);
 		}
 		bool operator!=(Zp t) {
 			return _n != t._n;
@@ -87,6 +88,7 @@ public:
 				m[i][j] = o.m[i][j];
 			}
 		}
+		return (*this);
 	}
 	bool operator==(Matriz o) {
 		for(int i=0;i<3;i++) {
