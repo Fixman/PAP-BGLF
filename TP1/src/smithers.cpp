@@ -14,11 +14,12 @@ int maxExp2Menor(int N) {
 // Devuelve los índices de los bits en 1 de L
 vi bitsEn1(int L) {
     vi res;
-    for(int i=0; i<(int)sizeof(L)*8; i++) {
-        if(L&(1<<i)) {
-            res.push_back(i);
-        }
-    }
+    int idx=0;
+    while(L>0){
+		if(L%2) res.push_back(idx);
+		L/=2;
+		idx++;
+	}
     return res;
 }
 
@@ -34,13 +35,16 @@ public:
         
         // productos[i][j] posee el producto del arreglo que empieza en 
         // i con longitud 2^j. 
-        // Inicializamos todos los productos con el primer elemento.
+        // Al principio inicializamos todos los productos[i][k] para todo k con 
+        // el elemento i, que en definitiva es productos[i][0].
+        // productos[][] tiene tamaño O(N*log(N)), dado que se crean N arreglos 
+        // cada uno de tamaño exp que es O(log(N)), porque 2^exp <= N
         for(int i=0; i<N; i++) productos[i] = vm(exp, M[i]);
         
-        // Llenamos la tabla de productorias. 
+        // Llenamos la tabla con las productorias. 
         // Inicialmente, productos[i][j] = productos[i][j-1], es decir, 
-        // la potencia anterior. De ser posible, se agrega el subarreglo 
-        // siguiente de tamaño 2^(j-1).
+        // la potencia anterior. De ser posible, se multiplica por el subarreglo 
+        // siguiente de tamaño 2^(j-1), en caso de que haya más elementos adelante todavía. 
         for(int j=1; j<exp; j++) {
             for(int i=0; i<N; i++) {
                 productos[i][j] = productos[i][j-1];
@@ -51,10 +55,20 @@ public:
     }
     
     vm calcularSubArreglos(int L) {
-        // Calculamos las productorias de sub-arreglos de largo L. 
-        // Usando producto[][] y el desarrollo binario de L, podemos 
-        // construir los sub-arreglos de tamaño L en log(L), dado que 
-        // un número L tendrá log(L) bits, y como mucho log(L) bits en 1. 
+        // Calculamos las productorias de los todos sub-arreglos de 
+        // largo exactamente L en el arreglo N (que son N-L+1 exactamente). 
+        // Para esto, usamos productos[][] y el desarrollo binario de L. 
+        // Supongamos que queremos la productoria P del sub-arreglo que comienza en i 
+        // (con 0 <= i < N-L, de modo que el sub-arreglo no se va fuera del arreglo original). 
+        // Llevamos un índice idx que comienza en i. 
+        // Iteramos sobre los bits del desarrollo binario de L. Sea j un bit de L; 
+        // si j está en 1, quiere decir que lo necesitamos para formar L, es decir que necesitamos 
+        // sumar 2^j para formar L. Entonces, cuando j es 1 agregamos la productoria de tamaño 2^j 
+        // que comienza en idx a nuestro resultado, que no es otra cosa que productos[idx][j]. Luego 
+        // de esto, incrementamos idx en 2^j, dado que esos elementos ya los incluímos en P. 
+        // Al terminar de iterar sobre los bits de L, tendremos P. Como L <= N, L tiene log(N) bits, 
+        // por tanto armar P cuesta log(N). Como hacemos esto para cada sub-arreglo, y hay O(N) de estos, 
+        // podemos calcular todos en O(N*log(N)). 
         int N = (int)M.size();
         vi bitsL = bitsEn1(L);
         vm subArreglos;
