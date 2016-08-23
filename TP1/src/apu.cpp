@@ -70,7 +70,10 @@ int comprarRosquillas(std::vector <int> &D, int p)
 	// así que la complejidad total es O(2^(n / 2) * n).
 	int best = 0;
 	for (int r : valuesRight)
-		best = std::max(best, r + *--valuesLeft.upper_bound(p - r));
+	{
+		if (r <= p)
+			best = std::max(best, r + *--valuesLeft.upper_bound(p - r));
+	}
 
 	return best;
 }
