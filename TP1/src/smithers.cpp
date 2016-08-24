@@ -43,8 +43,16 @@ public:
         
         // Llenamos la tabla con las productorias. 
         // Inicialmente, productos[i][j] = productos[i][j-1], es decir, 
-        // la potencia anterior. De ser posible, se multiplica por el subarreglo 
-        // siguiente de tamaño 2^(j-1), en caso de que haya más elementos adelante todavía. 
+        // la potencia anterior que comienza en i. De ser posible, 
+        // se multiplica por el subarreglo siguiente de tamaño 2^(j-1), 
+        // que estará en productos[i+2^(j-1)][j-1], 
+        // en caso de que haya más elementos adelante todavía. 
+        // Calculamos las productorias en orden del exponente, es decir, 
+        // primero todas las de largo 2^1, luego las de largo 2^2, y así. 
+        // De este modo, para calcular una productoria de largo 2^j, simplemente 
+        // usamos 2 productorias de largo 2^(j-1) que ya fueron calculadas, y por 
+        // tanto cada productoria es O(1). Finalmente, calcular todas las productorias 
+        // es O(N*log(N)). 
         for(int j=1; j<exp; j++) {
             for(int i=0; i<N; i++) {
                 productos[i][j] = productos[i][j-1];
@@ -59,11 +67,11 @@ public:
         // largo exactamente L en el arreglo N (que son N-L+1 exactamente). 
         // Para esto, usamos productos[][] y el desarrollo binario de L. 
         // Supongamos que queremos la productoria P del sub-arreglo que comienza en i 
-        // (con 0 <= i < N-L, de modo que el sub-arreglo no se va fuera del arreglo original). 
+        // (con 0 <= i < N-L, es decir que el sub-arreglo no se va fuera del arreglo original). 
         // Llevamos un índice idx que comienza en i. 
         // Iteramos sobre los bits del desarrollo binario de L. Sea j un bit de L; 
         // si j está en 1, quiere decir que lo necesitamos para formar L, es decir que necesitamos 
-        // sumar 2^j para formar L. Entonces, cuando j es 1 agregamos la productoria de tamaño 2^j 
+        // sumar 2^j para formar L. Entonces, cuando j es 1, agregamos la productoria de tamaño 2^j 
         // que comienza en idx a nuestro resultado, que no es otra cosa que productos[idx][j]. Luego 
         // de esto, incrementamos idx en 2^j, dado que esos elementos ya los incluímos en P. 
         // Al terminar de iterar sobre los bits de L, tendremos P. Como L <= N, L tiene log(N) bits, 
