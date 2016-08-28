@@ -89,10 +89,16 @@ La complejidad final en tiempo de hacer el merge de los dos conjuntos es \( \big
 
 Se hicieron algunos casos de prueba de casos extremos del problema. En particular,
 
-\begin{tabularx}{\textwidth}{l l l}
+\begin{flushleft}
+\begin{tabulary}{\textwidth}{@{}|C|L|L|@{}}
+\hline
 \textbf{Caso de prueba} & \textbf{Archivo de entrada} & \textbf{Salida esperada} \\
+\hline
 Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuTodo.in} & \lstinputlisting{../src/casos/apuTodo.out} \\
-Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuNada.in} & \lstinputlisting{../src/casos/apuNada.out} \\
-Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuUna.in} & \lstinputlisting{../src/casos/apuUna.out} \\
-Homero se puede comer todas las rosquillas & \lstinputlisting[breaklines]{../src/casos/apuGrande.in} & \lstinputlisting{../src/casos/apuGrande.out}
-\end{tabularx}
+Homero no puede comer ninguna rosquilla & \lstinputlisting{../src/casos/apuNada.in} & \lstinputlisting{../src/casos/apuNada.out} \\
+Homero se puede comer una sola & \lstinputlisting{../src/casos/apuUna.in} & \lstinputlisting{../src/casos/apuUna.out} \\
+Homero se puede comprar muchos paquetes de rosquillas & \lstinputlisting[linewidth=4cm,breaklines,breakindent=0em]{../src/casos/apuGrande.in} & El programa termina en menos de 1 segundo. \\
+Homero se puede comer muchas rosquillas & \texttt{apuOverflow.in} & \lstinputlisting{../src/casos/apuOverflow.out} \\
+\hline
+\end{tabulary}
+\end{flushleft}
