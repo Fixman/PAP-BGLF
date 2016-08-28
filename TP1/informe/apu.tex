@@ -1,4 +1,98 @@
 \newpage{}
 \section{La Tienda de Apu}
 
-%\lstinputlisting{../src/apu.cpp}
+\subsection{Soluciones teóricas al problema}
+
+\subsubsection{Backtracking na\"ive}
+
+Una posible manera de solucionar el problema es usar backtracking normal. En particular, se puede definir una función \( \mathcal{B} : \{Tamano\} \times precio \times precio \rightarrow precio \) que, dado un conjunto de tamaños de rosquillas \( D_1, \ldots, D_N \), un precio \( P \), y el precio ya pagado  \( p \), diga cuanta es la mayor cantidad de plata que puede gastar comprando las rosquillas en los argumentos para que en total gaste menos de \( P \) pesos.
+
+\begin{align*}
+\mathcal{B} (\varnothing, P, p) =
+	&\begin{cases}
+		p & \text{ si \(p \leq P\)} \\
+		0 & \text{ si \(p > P\)}
+	\end{cases} \\
+\mathcal{B} \left( \left\{ D_1, D_2, \ldots, D_N \right\}, P, p \right) = \max &\left(
+	\begin{aligned}
+		&\mathcal{B} \left( \left\{ D_2, \ldots, D_N \right\}, P, p + D_1 \right) \\
+		&\mathcal{B} \left( \left\{ D_2, \ldots, D_N \right\}, P, p \right)
+	\end{aligned}
+	\right)
+\end{align*}
+
+El resultado de \( \mathcal{B}(D, P, 0) \) sería el mejor resultado del problema, ya que
+
+\begin{itemize}
+	\item Homero empieza comprando 0 pesos en rosquillas.
+	\item Si no hay rosquillas disponibles, Homero no puede gastar más plata en rosquillas.
+	\item Si hay dos casos donde se gasta menos que \( P \) pesos, el mejor caso es el que se gastó el mayor valor.
+	\item El resultado no va a ser menor a 0; lo peor que le puede pasar a Homero es no poder comprar ninguna rosquilla.
+	\item Cada rosquilla se puede comprar solo una vez.
+	\item Cada combinación de \( F \subseteq D \) de rosquillas compradas por Homero es contada. En particular, cada \( d \in D \) aparece y no aparece en el precio final, alternativamente.
+\end{itemize}
+
+Si se implementa una función \( \mathrm{B} \) que devuelva el resultado de \( \mathcal{B} \) recursivamente, la complejidad en tiempo sería.
+
+\begin{align*}
+	\bigO(1) & \text{ en el caso base.} \\
+	\bigO(1) & \text{ en cada paso de la recursión.} \\
+	\bigO(2^N) & \text{ pasos de la recursión diferentes: dos paso por cada elemento de D.} \\
+	\bigO(2^N) \cdot \bigO(1) = \bigO(2^N) & \text{ complejidad de tiempo total.}
+\end{align*}
+
+Esto no es lo suficientemente rápido para las restricciones del problema, así que hay que usar otro método.
+
+\subsubsection{Meet in the Middle}
+
+Dado cierto número \( \tau \in \left[ 1, N\right ] \), separamos D en dos conjuntos.
+
+\begin{align*}
+	A &= D_1, \ldots, D_\tau \\
+	B &= D_{\tau + 1}, \ldots, D_N
+\end{align*}
+
+Luego, definimos la función \( \mathcal{V} : \{Tamano\} \times precio \times precio \rightarrow \{precio\} \) tal que \( V(D, P, p) \) es el conjunto de rosquillas subconjunto de \( D \) que se pueden comprar con \( P \) pesos si ya se pagaron \( p \) pesos de una manera similar a \( \mathcal{B} \).
+
+\begin{align*}
+\mathcal{V} (\varnothing, P, p) =
+	&\begin{cases}
+		\{p\} & \text{ si \(p \leq P\)} \\
+		\varnothing & \text{ si \(p > P\)}
+	\end{cases} \\
+\mathcal{V} \left( \left\{ D_1, D_2, \ldots, D_N \right\}, P, p \right) = &
+	\begin{aligned}
+		& \mathcal{V} \left( \left\{ D_2, \ldots, D_N \right\}, P, p + D_1 \right) \\
+		\mathlarger{\cup} \; & \mathcal{V} \left( \left\{ D_2, \ldots, D_N \right\}, P, p \right)
+	\end{aligned}
+\end{align*}
+
+Se puede ver que la complejidad en tiempo de calcular \( \mathcal{V}(D, P, p) \) es \( \bigO \left( 2^{\left| D \right|} \right) \) usando el mismo cálculo que se usó para \( \mathcal{B} \).
+
+Si calculamos \( Q = \mathcal{V}(A, P, 0); W = \mathcal{V}(B, P, 0) \), estos dos valores van a ser subconjuntos de cantidades de donas que se pueden comprar dentro de \( A \) y \( B \). Si la suma de dos elementos de cada uno de los conjuntos es menor que \( P \), entonces se pueden comprar cierta cantidad de rosquillas de \( A \) y cierta cantidad de \( B \) sin gastar más plata que la que se tiene. Calcular estos dos conjuntos tiene complejidad \( \bigO(2^\tau + 2^{N - \tau}) \).
+
+Por cada elemento \( q \) de entre los \( t \leq 2^{\left| A \right|} \) elementos de \( Q \), se puede elegir cualquier elemento \( w \in W \) de sus \( y \leq 2^{\left| B \right|} \) elementos siempre y cuando la suma de cada uno sea menor o igual a \( P \). Pero, ¿cuál elegir? Como queremos maximizar la cantida de donas compradas, se debería tomar, por cada \( q \in Q \) el mayor elemento \( w \in W \) posible tal que \( q + w \leq P \), osea, \( w \leq P - q \). Como \( A \cup B = D \) esto da todas las soluciones posibles, y una de estas tiene que ser la solución óptima.
+
+Usando una estructura de árbol balanceado para representar los conjuntos (como \texttt{set} de C++), la operación de buscar el mayor elemento menor o igual a otro elemento en \( W \) (similar a \texttt{lower\_bound}) tiene complejidad \( \bigO \left( \log \left| W \right| \right) = \bigO \left( \log 2^{\left| B \right|} \right) = \bigO \left( \left| B \right| \right) = \bigO \left( N - \tau \right) \). Como esto se tiene que hacer por cada elemento de \( Q \), la complejidad final del ``merge'' es \( \bigO (2^\tau \cdot (N - \tau)) = \bigO (N \cdot 2^\tau) \).
+
+La complejidad final en tiempo de hacer el merge de los dos conjuntos es \( \bigO(2^\tau + 2^{N - \tau} + N \cdot 2^\tau) = \bigO(2^{N - \tau} + N \cdot 2^\tau) \). Como la exponenciación crece mucho más rápido que la multiplicación, la complejidad menor se alcanza poniendo \( \tau = \nicefrac{1}{2} \). Esta complejidad entonces queda como \( \bigO(2^\frac{1}{2} + N \cdot 2^\frac{1}{2}) = \bigO(N \cdot \frac{1}{2}) \), que esta vez sí cumple con las restricciones del enunciado.
+
+\newpage{}
+
+\subsection{Código de la solución}
+
+\lstinputlisting[numbers = left]{../src/apu.cpp}
+
+\newpage{}
+
+\subsection{Casos de prueba}
+
+Se hicieron algunos casos de prueba de casos extremos del problema. En particular,
+
+\begin{tabularx}{\textwidth}{l l l}
+\textbf{Caso de prueba} & \textbf{Archivo de entrada} & \textbf{Salida esperada} \\
+Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuTodo.in} & \lstinputlisting{../src/casos/apuTodo.out} \\
+Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuNada.in} & \lstinputlisting{../src/casos/apuNada.out} \\
+Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuUna.in} & \lstinputlisting{../src/casos/apuUna.out} \\
+Homero se puede comer todas las rosquillas & \lstinputlisting[breaklines]{../src/casos/apuGrande.in} & \lstinputlisting{../src/casos/apuGrande.out}
+\end{tabularx}

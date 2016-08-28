@@ -4,6 +4,14 @@
 \usepackage[T1]{fontenc}
 \usepackage{listings}
 \usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{relsize}
+\usepackage{nicefrac}
+\usepackage{tabularx}
+
+\newcommand{\bigO}{\mathcal{O}}
 
 \title{Problemas, Algoritmos, y Programación \\ Trabajo Práctico 1}
 \author{Jonás Levy Alfie \and Denys Bulavka \and Martín Fixman \and Facundo Gutiérrez}
@@ -11,7 +19,10 @@
 
 \lstset{%
   language=C++,
-  title=\lstname
+  mathescape=true,
+  basicstyle=\footnotesize,
+  numberstyle = \tiny,
+  tabsize = 2
 }
 
 \begin{document}
@@ -21,9 +32,9 @@
 \newpage
 \tableofcontents
 
-\include{apu}
-\include{lisa}
-\include{frink}
-\include{smithers}
+\input{apu}
+\input{lisa}
+\input{frink}
+\input{smithers}
 
 \end{document}
