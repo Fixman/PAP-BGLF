@@ -5,7 +5,7 @@
 
 // Backtracker(D).backtrack() construye una lista de costos posibles para
 // comprar rosquillas de costo D_0, ..., D_m.
-// Llama a backtrackFrom 2 veces por cada llamada desde D_0 hasta D_m, así
+// Llama a backtrackFrom 2 veces por cada llamada desde D_0 hasta D_m, asi
 // que la complejidad del algoritmo es O(2^m).
 struct Backtracker
 {
@@ -46,7 +46,7 @@ struct Backtracker
 // La complejidad total es O(2^(n / 2) + 2^(n / 2) * n) = O(2^(n / 2) * n).
 int comprarRosquillas(std::vector <int> &D, int p)
 {
-	// Particionar D en dos partes con igual tamaño.
+	// Particionar D en dos partes con igual tamano.
 	std::vector <int> A(D.begin(), D.begin() + D.size() / 2);
 	std::vector <int> B(D.begin() + D.size() / 2, D.end());
 
@@ -56,18 +56,18 @@ int comprarRosquillas(std::vector <int> &D, int p)
 	std::set <int> valuesLeft = Backtracker(A).backtrack();
 	std::set <int> valuesRight = Backtracker(B).backtrack();
 
-	// Se deberían poder gastar 0 pesos en la mitad izquierda, ya que siempre
+	// Se deberian poder gastar 0 pesos en la mitad izquierda, ya que siempre
 	// se puede no comprar ninguna rosquilla. Si esto no fuese cierto,
-	// *--valuesLeft.upper_bound(x) podría fallar con x < min(valuesLeft).
+	// *--valuesLeft.upper_bound(x) podria fallar con x < min(valuesLeft).
 	assert(valuesLeft.find(0) != valuesLeft.end());
 
-	// Por cada elemento de la partición de la derecha, buscar el elemento de
-	// la partición de la izquierda tal que comprando esas partes de las dos
+	// Por cada elemento de la particiin de la derecha, buscar el elemento de
+	// la particion de la izquierda tal que comprando esas partes de las dos
 	// mitades cueste menos que p, pero que igual se compren la mayor cantidad
 	// de donas. Entre todos los elementos, elegir el que maximice la suma.
-	// Como std::set::upper_bound es un árbol balanceado, la complejidad
+	// Como std::set::upper_bound es un arbol balanceado, la complejidad
 	// de esto es O(log 2^(n / 2)) = O(n) por cada elemento de valuesRight,
-	// así que la complejidad total es O(2^(n / 2) * n).
+	// asi que la complejidad total es O(2^(n / 2) * n).
 	int best = 0;
 	for (int r : valuesRight)
 	{
