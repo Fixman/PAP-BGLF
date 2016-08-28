@@ -3,19 +3,24 @@
 #include <set>
 #include <vector>
 
+static_assert(
+	sizeof(long) >= 8,
+	"long tiene que ser de por lo menos 64 bit para que el codigo no haga overflow"
+);
+
 // Backtracker(D).backtrack() construye una lista de costos posibles para
 // comprar rosquillas de costo D_0, ..., D_m.
 // Llama a backtrackFrom 2 veces por cada llamada desde D_0 hasta D_m, asi
 // que la complejidad del algoritmo es O(2^m).
 struct Backtracker
 {
-	const std::vector <int> &D;
-	std::set <int> R;
+	const std::vector <long> &D;
+	std::set <long> R;
 
 	// Hacer backtracking en D_t, ..., D_m, mientras que se asume que ya se
 	// compraron c rosquillas.
 	// Cuando se llega al final, agregar el resultado al conjunto R.
-	void backtrackFrom(int t, int c)
+	void backtrackFrom(int t, long c)
 	{
 		if (t == D.size())
 			R.insert(c);
@@ -27,7 +32,7 @@ struct Backtracker
 	}
 
 	// Hacer backtracking para encontrar
-	std::set <int> &backtrack()
+	std::set <long> &backtrack()
 	{
 		if (R.empty())
 			backtrackFrom(0, 0);
@@ -35,7 +40,7 @@ struct Backtracker
 		return R;
 	}
 
-	Backtracker(const std::vector <int> &D)
+	Backtracker(const std::vector <long> &D)
 	: D(D)
 	{
 	}
@@ -44,17 +49,17 @@ struct Backtracker
 // Devuelve la mayor cantidad de rosquillas que se pueden comprar si vienen
 // en paquetes de D_0, ..., D_n, y se tienen p pesos.
 // La complejidad total es O(2^(n / 2) + 2^(n / 2) * n) = O(2^(n / 2) * n).
-int comprarRosquillas(std::vector <int> &D, int p)
+long comprarRosquillas(std::vector <long> &D, long p)
 {
 	// Particionar D en dos partes con igual tamano.
-	std::vector <int> A(D.begin(), D.begin() + D.size() / 2);
-	std::vector <int> B(D.begin() + D.size() / 2, D.end());
+	std::vector <long> A(D.begin(), D.begin() + D.size() / 2);
+	std::vector <long> B(D.begin() + D.size() / 2, D.end());
 
 	// Buscar la lista de costos posibles para comprar rosquillas tanto en la
 	// mitad izquierda como en la mitad derecha.
 	// Cada uno de esos tiene complejidad temporal O(2^(n / 2)).
-	std::set <int> valuesLeft = Backtracker(A).backtrack();
-	std::set <int> valuesRight = Backtracker(B).backtrack();
+	std::set <long> valuesLeft = Backtracker(A).backtrack();
+	std::set <long> valuesRight = Backtracker(B).backtrack();
 
 	// Se deberian poder gastar 0 pesos en la mitad izquierda, ya que siempre
 	// se puede no comprar ninguna rosquilla. Si esto no fuese cierto,
@@ -68,8 +73,8 @@ int comprarRosquillas(std::vector <int> &D, int p)
 	// Como std::set::upper_bound es un arbol balanceado, la complejidad
 	// de esto es O(log 2^(n / 2)) = O(n) por cada elemento de valuesRight,
 	// asi que la complejidad total es O(2^(n / 2) * n).
-	int best = 0;
-	for (int r : valuesRight)
+	long best = 0;
+	for (long r : valuesRight)
 	{
 		if (r <= p)
 			best = std::max(best, r + *--valuesLeft.upper_bound(p - r));
@@ -80,11 +85,12 @@ int comprarRosquillas(std::vector <int> &D, int p)
 
 int main()
 {
-	int p, n;
+	long p;
+	int n;
 	while (std::cin >> p >> n)
 	{
-		std::vector <int> D(n);
-		for (int &k : D)
+		std::vector <long> D(n);
+		for (long &k : D)
 			std::cin >> k;
 
 		std::cout << comprarRosquillas(D, p) << std::endl;

@@ -77,7 +77,22 @@ Usando una estructura de árbol balanceado para representar los conjuntos (como 
 
 La complejidad final en tiempo de hacer el merge de los dos conjuntos es \( \bigO(2^\tau + 2^{N - \tau} + N \cdot 2^\tau) = \bigO(2^{N - \tau} + N \cdot 2^\tau) \). Como la exponenciación crece mucho más rápido que la multiplicación, la complejidad menor se alcanza poniendo \( \tau = \nicefrac{1}{2} \). Esta complejidad entonces queda como \( \bigO(2^\frac{1}{2} + N \cdot 2^\frac{1}{2}) = \bigO(N \cdot \frac{1}{2}) \), que esta vez sí cumple con las restricciones del enunciado.
 
+\newpage{}
+
 \subsection{Código de la solución}
 
-\lstinputlisting{../src/apu.cpp}
+\lstinputlisting[numbers = left]{../src/apu.cpp}
 
+\newpage{}
+
+\subsection{Casos de prueba}
+
+Se hicieron algunos casos de prueba de casos extremos del problema. En particular,
+
+\begin{tabularx}{\textwidth}{l l l}
+\textbf{Caso de prueba} & \textbf{Archivo de entrada} & \textbf{Salida esperada} \\
+Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuTodo.in} & \lstinputlisting{../src/casos/apuTodo.out} \\
+Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuNada.in} & \lstinputlisting{../src/casos/apuNada.out} \\
+Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuUna.in} & \lstinputlisting{../src/casos/apuUna.out} \\
+Homero se puede comer todas las rosquillas & \lstinputlisting[breaklines]{../src/casos/apuGrande.in} & \lstinputlisting{../src/casos/apuGrande.out}
+\end{tabularx}
