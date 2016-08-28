@@ -75,13 +75,13 @@ Por cada elemento \( q \) de entre los \( t \leq 2^{\left| A \right|} \) element
 
 Usando una estructura de árbol balanceado para representar los conjuntos (como \texttt{set} de C++), la operación de buscar el mayor elemento menor o igual a otro elemento en \( W \) (similar a \texttt{lower\_bound}) tiene complejidad \( \bigO \left( \log \left| W \right| \right) = \bigO \left( \log 2^{\left| B \right|} \right) = \bigO \left( \left| B \right| \right) = \bigO \left( N - \tau \right) \). Como esto se tiene que hacer por cada elemento de \( Q \), la complejidad final del ``merge'' es \( \bigO (2^\tau \cdot (N - \tau)) = \bigO (N \cdot 2^\tau) \).
 
-La complejidad final en tiempo de hacer el merge de los dos conjuntos es \( \bigO(2^\tau + 2^{N - \tau} + N \cdot 2^\tau) = \bigO(2^{N - \tau} + N \cdot 2^\tau) \). Como la exponenciación crece mucho más rápido que la multiplicación, la complejidad menor se alcanza poniendo \( \tau = \nicefrac{1}{2} \). Esta complejidad entonces queda como \( \bigO(2^\frac{1}{2} + N \cdot 2^\frac{1}{2}) = \bigO(N \cdot \frac{1}{2}) \), que esta vez sí cumple con las restricciones del enunciado.
+La complejidad final en tiempo de hacer el merge de los dos conjuntos es \( \bigO(2^\tau + 2^{N - \tau} + N \cdot 2^\tau) = \bigO(2^{N - \tau} + N \cdot 2^\tau) \). Como la exponenciación crece mucho más rápido que la multiplicación, la complejidad menor se alcanza poniendo \( \tau = \nicefrac{1}{2} \). Esta complejidad entonces queda como \( \bigO(2^\frac{1}{2} + N \cdot 2^\frac{1}{2}) = \bigO(N \cdot 2^\frac{1}{2}) \), que esta vez sí cumple con las restricciones del enunciado.
 
 \newpage{}
 
 \subsection{Código de la solución}
 
-\lstinputlisting[numbers = left]{../src/apu.cpp}
+\lstinputlisting[numbers = left]{../src/apu/apu.cpp}
 
 \newpage{}
 
@@ -89,10 +89,16 @@ La complejidad final en tiempo de hacer el merge de los dos conjuntos es \( \big
 
 Se hicieron algunos casos de prueba de casos extremos del problema. En particular,
 
-\begin{tabularx}{\textwidth}{l l l}
+\begin{flushleft}
+\begin{tabulary}{\textwidth}{@{}|L|L|L|@{}}
+\hline
 \textbf{Caso de prueba} & \textbf{Archivo de entrada} & \textbf{Salida esperada} \\
-Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuTodo.in} & \lstinputlisting{../src/casos/apuTodo.out} \\
-Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuNada.in} & \lstinputlisting{../src/casos/apuNada.out} \\
-Homero se puede comer todas las rosquillas & \lstinputlisting{../src/casos/apuUna.in} & \lstinputlisting{../src/casos/apuUna.out} \\
-Homero se puede comer todas las rosquillas & \lstinputlisting[breaklines]{../src/casos/apuGrande.in} & \lstinputlisting{../src/casos/apuGrande.out}
-\end{tabularx}
+\hline
+Homero se puede comer todas las rosquillas & \lstinputlisting{../src/apu/apuTodo.in} & \lstinputlisting{../src/apu/apuTodo.out} \\ \hline
+Homero no puede comer ninguna rosquilla & \lstinputlisting{../src/apu/apuNada.in} & \lstinputlisting{../src/apu/apuNada.out} \\ \hline
+Homero se puede comer una sola & \lstinputlisting{../src/apu/apuUna.in} & \lstinputlisting{../src/apu/apuUna.out} \\ \hline
+Homero se puede comprar muchos paquetes de rosquillas & \lstinputlisting[linewidth=4cm,breaklines,breakindent=0em]{../src/apu/apuGrande.in} & El programa termina en menos de 1 segundo. \\ \hline
+Homero se puede comer muchas rosquillas & \texttt{apuOverflow.in} & \lstinputlisting{../src/apu/apuOverflow.out} \\
+\hline
+\end{tabulary}
+\end{flushleft}
