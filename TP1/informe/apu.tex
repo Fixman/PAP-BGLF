@@ -1,4 +1,69 @@
 \newpage{}
 \section{La Tienda de Apu}
 
-%\lstinputlisting{../src/apu.cpp}
+\subsection{Soluciones teóricas al problema}
+
+\subsubsection{Backtracking na\"ive}
+
+Una posible manera de solucionar el problema es usar backtracking normal. En particular, se puede definir una función \( \mathcal{B} : \{Tamano\} \times precio \times precio \rightarrow precio \) que, dado un conjunto de tamaños de rosquillas \( D_1, \ldots, D_N \), un precio \( P \), y el precio ya pagado  \( p \), diga cuanta es la mayor cantidad de plata que puede gastar comprando las rosquillas en los argumentos para que en total gaste menos de \( P \) pesos.
+
+\begin{align*}
+\mathcal{B} (\varnothing, P, p) =
+	&\begin{cases}
+		p & \text{ si \(p \leq P\)} \\
+		0 & \text{ si \(p > P\)}
+	\end{cases} \\
+\mathcal{B} \left( \left\{ D_1, D_2, \ldots, D_N \right\}, P, p \right) = \max &\left(
+	\begin{aligned}
+		&\mathcal{B} \left( \left\{ D_2, \ldots, D_N \right\}, P, p + D_1 \right) \\
+		&\mathcal{B} \left( \left\{ D_2, \ldots, D_N \right\}, P, p \right)
+	\end{aligned}
+	\right)
+\end{align*}
+
+El resultado de \( \mathcal{B}(D, P, 0) \) sería el mejor resultado del problema, ya que
+
+\begin{itemize}
+	\item Homero empieza comprando 0 pesos en rosquillas.
+	\item Si no hay rosquillas disponibles, Homero no puede gastar más plata en rosquillas.
+	\item Si hay dos casos donde se gasta menos que \( P \) pesos, el mejor caso es el que se gastó el mayor valor.
+	\item El resultado no va a ser menor a 0; lo peor que le puede pasar a Homero es no poder comprar ninguna rosquilla.
+	\item Cada rosquilla se puede comprar solo una vez.
+	\item Cada combinación de \( F \subseteq D \) de rosquillas compradas por Homero es contada. En particular, cada \( d \in D \) aparece y no aparece en el precio final, alternativamente.
+\end{itemize}
+
+Si se implementa una función \( \mathrm{B} \) que devuelva el resultado de \( \mathcal{B} \) recursivamente, la complejidad en tiempo sería.
+
+\begin{align*}
+	\bigO(1) & \text{ en el caso base.} \\
+	\bigO(1) & \text{ en cada paso de la recursión.} \\
+	\bigO(2^N) & \text{ pasos de la recursión diferentes: dos paso por cada elemento de D.} \\
+	\bigO(2^N) \cdot \bigO(1) = \bigO(2^N) & \text{ complejidad de tiempo total.}
+\end{align*}
+
+Esto no es lo suficientemente rápido para las restricciones del problema, así que hay que usar otro método.
+
+\subsubsection{Meet in the Middle}
+
+Dado cierto número \( \tau \in \left[ 1, N\right ] \), separamos D en dos conjuntos.
+
+\begin{align*}
+	A &= D_1, \ldots, D_\tau
+	B &= D_{\tau + 1}, \ldots, D_N
+\end{align*}
+
+Luego, definimos la función \( \mathcal{V} : \{Tamano\} \times precio \times precio \rightarrow {precio} \) tal que \( V(D, P, p) \) es el conjunto de rosquillas subconjunto de \( D \) que se pueden comprar con \( P \) pesos si ya se pagaron \( p \) pesos de una manera similar a \( \mathcal{B} \).
+
+\begin{align*}
+\mathcal{V} (\varnothing, P, p) =
+	&\begin{cases}
+		{p} & \text{ si \(p \leq P\)} \\
+		{} & \text{ si \(p > P\)}
+	\end{cases} \\
+\mathcal{B} \left( \left\{ D_1, D_2, \ldots, D_N \right\}, P, p \right) = \bigcup &\left(
+	\begin{aligned}
+		&\mathcal{B} \left( \left\{ D_2, \ldots, D_N \right\}, P, p + D_1 \right) \\
+		&\mathcal{B} \left( \left\{ D_2, \ldots, D_N \right\}, P, p \right)
+	\end{aligned}
+	\right)
+\end{align*}
