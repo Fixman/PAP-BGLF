@@ -1,2 +1,69 @@
 \newpage{}
 \section{El error de Smithers}
+\subsection{Descripción del problema}
+Dadas una matriz $M\in Z_p$ ($p$ es 10007, el cual es primo), un arreglo 
+de N matrices en $Z_p$ (todas las matrices son de $3 \times 3$), 
+y un entero $L$ ($1 <= L <= N$), determinar si existe algún subarreglo 
+de longitud exactamente $L$ cuyo producto matricial 
+sea igual a $M$. 
+
+Cabe notar que con subarreglo nos referimos a que debe ser una 
+subsecuencia contigua del arreglo original. 
+
+Para una instancia de este problema, se pide sólamente devolver ``SI'' en 
+caso de que exista algún subarreglo de largo $L$ cuyo producto sea $M$, o devolver 
+``NO'' en caso contrario. Cada instancia debe ser resuelta con complejidad temporal 
+$O(N log N)$, con $N$ 
+la cantidad de matrices en el arreglo original. 
+
+\subsection{Soluciones al problema}
+\textbf{Observaciones}\\
+
+Primero anotamos algunas observaciones respecto del problema, que serán claves a la
+hora de plantear soluciones: 
+\begin{enumerate}
+    \item Todas las matrices son de $3 \times 3$, de modo que los productos siempre pueden 
+    hacerse (es decir, las dimensiones de las matrices coinciden). Más aún, al ser matrices 
+    de tamaño fijo, podemos considerar que hacer el producto entre 2 matrices tiene 
+    complejidad $O(1)$. 
+    \item No se nos garantiza que las matrices sean inversibles. Si bien, las matrices 
+    pertenecen a $Z_p$ con $p$ primo, podríamos tener una matriz directamente nula. 
+    De modo que no será viable un algoritmo que asuma que las matrices son inversibles para 
+    así ``dividir'' matrices (o multiplicar por el inverso). De modo que no tenemos inverso para la 
+    operación de multiplicar matrices. De sí tenerlo, el problema podría ser resuelto con 
+    otras complejidades aún mejores incluso. 
+\end{enumerate}
+
+Existen varios posibles algoritmos para resolver este problema, basados en Divide \& Conquer, 
+Programación Dinámica, y estructuras más avanzadas aún no vistas en la materia. La solución que 
+planteamos en este trabajo estará más bien basada en programación dinámica, consta de calcular 
+los productos de 
+todos los subarreglos de largo exactamente $L$ eficientemente y verificar si alguno de ellos 
+es igual a $M$. \\
+
+\textbf{Algoritmo planteado}\\
+
+Llamaremos $A$ al arreglo original de las $N$ matrices. 
+Sea $K$ el máximo natural tal que $2^K <= N$, entonces $K \in O(log N)$. Crearemos un arreglo 
+bidimensional de matrices llamado \texttt{productos[][]} de tamaño $N \times K$, de modo que 
+\texttt{productos[][]} tiene tamaño $O(N log N)$. 
+
+Lo que querremos almacenar en \texttt{productos[i][j]} será \textbf{el producto del subarreglo que 
+comienza en $A_i$ de longitud hasta $2^j$} (es decir, $A_i \times A_{i+1} \times ... \times A_{i+2^j}$). 
+
+Cabe notar que en el caso de que $i+2^j$ exceda al tamaño del arreglo ($N$), 
+\texttt{productos[i][j]} contendrá el producto desde $A_i$ hasta 
+la última matriz $A_n$ (esto será así, por ejemplo, para todos los valores \texttt{productos[N][j]} dado 
+que ya empiezan en la matriz $A_n$). \\
+
+Ahora definimos la siguiente recursión para calcular los valores de \texttt{productos[][]}: 
+
+\begin{align*}
+productos[i][j] =
+	&\begin{cases}
+		A_i & \text{si $j=0$} \\
+		productos[i][j-1] \times productos[i+2^{j-1}][j-1] & \text{si $j>0$ y $i+2^{j-1}<=N$} \\
+		productos[i][j-1] & \text{caso contrario} \\
+	\end{cases} \\
+\end{align*}
+
