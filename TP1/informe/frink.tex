@@ -1,2 +1,60 @@
 \newpage{}
 \section{Experimentos nucleares}
+\subsection{Soluci\'on teorica del problema}
+El programa toma una lista de numeros enteros y encuentra la m\'axima suma
+de numeros contiguos que se puede obtener, es decir, dado un arreglo
+de $N$ numeros enteros $A_1,\dots, A_N$ encuentra $A_i+\dots+A_j$ ,$j>i$ 
+m\'axima. Lo hace de manera golosa pues miro las sumas parciales, truncando
+a cero cuando me paso al negativo, es decir, si $S_j$ es la suma parcial 
+hasta el elemento $j$ entonces $S_{j+1}$ es el m\'aximo entre $S_j+A_{j+1}$ 
+y $0$, hago esto porque no me conviene acarrear valores negativos.
+
+
+Luego el m\'aximo de las sumas parciales truncadas, a partir de ahora
+lo llamo $maxGlobal$, es la suma contigua m\'axima, pues sino ,es decir, 
+existe $A_i+\dots +A_j$ ,$j>i$, que es mayor estricto que $maxGlobal$. 
+Puedo suponer sin p\'erdida de generalidad que $A_i+\dots +A_k\geq0$ 
+$\forall i\leq k\leq j$, pues si para alg\'un $k$ no lo \'es entonces 
+$A_{k+1}+\dots + A_j>A_i+\dots +A_j$ y repito el argumento con 
+$A_{k+1}+ \dots +A_j$ hasta obtener una suma contigua que no se anule en 
+cada paso. Sea $s$ el m\'inimo \'indice tal que $A_s+\dots+A_k\geq0$ 
+$\forall k\leq j$, entonces
+\begin{equation}
+	A_i+\dots +A_j \leq A_s+\dots+A_j = S_{s+j} \leq maxGlobal
+\end{equation}
+lo cual es un absurdo pues hab\'ia supuesto que $A_i+\dots +A_j>maxGlobal$,
+luego $maxGlobal$ es la suma contigua m\'axima.
+
+En el c\'odigo hacemos esto sin guardarnos todos los $S_j$ porque no los 
+necesitamos, solo nos quedamos con el m\'aximo valor de las sumas parciales
+truncadas en cada momento, $maxGlobal$, y la suma contigua truncada maxima
+que termina en el valor actual, $maxEnding$.
+
+\subsubsection{Correctitud de la implementaci\'on}
+Hacemos inducci\'on en $N$ para ver que la implementaci\'on es correcta, 
+formalmente lo que afirmo es que dado un arreglo de $N$ elementos, al 
+final de la ejecuci\'on del c\'odigo $maxGlobal$ y $maxEnd$ guardan la 
+suma m\'axima contigua de todo el arreglo y la suma parcial truncada maxima
+que termina en $A_N$ respectivamente.
+
+	Si $N=1$ entonces  $maxEnd$ toma el m\'aximo entre $A_1$ y $0$, que si
+	$A_1>=0$ entonces $maxGlobal$ toma este valor sino queda en $0$. 
+	Efectivamente cumplen el enunciado.
+	
+	
+	Supongo que vale para $N-1$, veamos que vale para $N$.
+	Por hip\'otesis inductiva despu\'es de $N-1$ iteraciones $maxGlobal$
+	guarda la suma m\'axima global de los primeros $N-1$ elementos y 
+	$maxEnd$ la suma m\'axima que termina en $A_{N-1}$. En la pr\'oxima 
+	iteraci\'on $maxEnd$ guarda el valor de la suma m\'axima que termina 
+	en $A_N$, si esta es mayor que $maxGlobal$ entonces $maxGlobal$ toma 
+	este valor sino se queda con el valor anterior. Finaliza la 
+	ejecuci\'on terminando $maxGlobal$ con el m\'aximo global de la 
+	secuencia y $maxEnding$ con la suma m\'as grande que termina en 
+	$A_N$, como queriamos.
+
+
+La complejidad del codigo es $O(N)$ pues hay un solo bucle for que se
+repite $N$ veces.
+\subsection{C\'odigo de la soluci\'on}
+\lstinputlisting[numbers = left]{../src/frink/frink.cpp}
