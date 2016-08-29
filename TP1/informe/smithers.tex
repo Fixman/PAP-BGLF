@@ -17,7 +17,7 @@ $O(N log N)$, con $N$
 la cantidad de matrices en el arreglo original. 
 
 \subsection{Soluciones al problema}
-\textbf{Observaciones}\\
+\subsubsection{Observaciones}
 
 Primero anotamos algunas observaciones respecto del problema, que serán claves a la
 hora de plantear soluciones: 
@@ -41,7 +41,7 @@ los productos de
 todos los subarreglos de largo exactamente $L$ eficientemente y verificar si alguno de ellos 
 es igual a $M$. \\
 
-\textbf{Algoritmo planteado}\\
+\subsubsection{Algoritmo: precómputo}
 
 Llamaremos $A$ al arreglo original de las $N$ matrices. 
 Sea $K$ el máximo natural tal que $2^K <= N$, entonces $K \in O(log N)$. Crearemos un arreglo 
@@ -67,3 +67,39 @@ productos[i][j] =
 	\end{cases} \\
 \end{align*}
 
+Con esto queremos decir lo siguiente: 
+\begin{itemize}
+\item Los productos con $j=0$ son los de longitud $2^0=1$, es decir, 
+son simplemente $A_i$. Son nuestro caso base. 
+\item Si $j>0$, la idea es que podamos formar el producto de largo $2^j$ 
+usando 2 productos ya calculados de largo $2^{j-1}$. Esto tiene sentido 
+porque $2 \times 2^{j-1} = 2^j$. Es decir, que para conseguir el producto 
+que comienza en $i$ de largo $2^j$ deberíamos usar: 
+    \begin{itemize}
+    \item $X:$ el que comienza en $i$ de largo $2^{j-1}$, e 
+    \item $Y:$ el que comienza exactamente luego de donde termina $X$, también de largo 
+    $2^{j-1}$. Como conocemos $j$, sabemos que $Y$ comenzará en $i+2^{j-1}$.
+    \end{itemize}
+\end{itemize}
+
+De esta manera, obteniendo $X$ e $Y$ correctamente, no habrá solapamiento entre ellos 
+y tampoco dejaremos elementos de $A$ fuera, y podremos calcular \texttt{productos[i][j]} 
+como $X \times Y$. 
+
+Puede ocurrir que $Y$ no exista, porque el índice en el cual comience este producto 
+($i+2^{j-1}$) caiga fuera del arreglo, o sea, que sea mayor a $N$. En este caso, 
+solo necesitamos $X$ para conseguir \texttt{productos[i][j]}, porque quiere decir que 
+el producto $X$ ya incluye a $A_n$, de modo que no hay más matrices para agregar. \\
+
+Si calculamos y almacenamos los valores \texttt{productos[][]} en orden 
+creciente de $j$ (es decir, de la longitud), al momento de calcular \texttt{productos[i][j]} 
+ya tendremos los de \texttt{j-1}, que son los que necesitamos. Calcular cada uno de estos es entonces, 
+usar una de las matrices dadas, o multiplicar 2 matrices que ya calculamos, de modo que 
+cada valor es $O(1)$. Como vimos antes, \texttt{productos[][]} tiene tamaño $O(N log N)$, 
+de modo que todo el precómputo lleva $O(N log N)$. 
+
+\subsubsection{Algoritmo: cálculo de los subarreglos de longitud $L$}
+
+\newpage
+\subsection{Código de la solución}
+\lstinputlisting[numbers = left]{../src/smithers/smithers.cpp}
