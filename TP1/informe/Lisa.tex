@@ -1,0 +1,67 @@
+\newpage{}
+\section*{El cumpleaños de Lisa}
+
+\subsection*{Descripción del Problema}
+
+El enunciado puede resumirse de la siguiente forma. Inicialmente tenemos un conjunto de $N$ amigas de Lisa (donde $ 1 \leq N \leq 18$) y además se tiene una matriz, llamémosla $D \in \mathbf{Z}^{N \times N}$, donde $D_{i,j}$ indica la diversión que aporta la pareja de amigas $A_i$ y $A_j$ en caso de concurrir a una misma fiesta (notar que puede ser negativa).
+
+Un conjunto de amigas nos define una fiesta, y se define la diversión de ese conjunto (fiesta) como la suma de las diversiones de todas las parejas de amigas del conjunto sin importar el orden, o sea, que la diversión que aportan $A_i$ con $A_j$ y $A_j$ con $A_i$ se cuenta solo una vez.
+
+Ahora, podemos definir la diversión de una partición, como la suma de las diversiones de los subconjuntos de la partición.
+
+Teniendo todo esto definido, la consigna del problema se resume en hallar la diversión óptima que puede tener una partición del conjunto de $N$ amigas original. 
+
+\subsection*{Solución propuesta al problema}
+
+La idea será describir la solución para un conjunto de amigas en función de sus subconjuntos. Para ello, notemos primero las siguientes observaciones:
+
+Vamos a suponer que tenemos una función $g$ que resuelve una instancia al problema dado (o sea, toma un conjunto de amigas con sus respectivas diversiones y calcula el valor óptimo de diversión que puede tener una partición del conjunto original).
+
+\begin{itemize}
+	\item \textbf{Observación 1} : La solución para un conjunto con una sola amiga es $0$. 
+
+	\textit{Demostración} : Dicha amiga no tiene otra amiga para aportar diversión (por enunciado, Lisa no aporta diversión a una fiesta).
+	\item \textbf{Observación 2} : Dado un conjunto $\mathcal{A}$ de amigas,   la solución, $g(\mathcal{A})$, puede escribirse como $g(\mathcal{B}) + g(\mathcal{C})$, para algún par $\mathcal{B}$ y $\mathcal{C}$, con $\mathcal{B},\mathcal{C} \subset \mathcal{A}$ y donde $\mathcal{B} \overset{d}{\cup} C = \mathcal{A}$ (unión disjunta).
+	
+	\textit{Demostración} : Si el valor óptimo se obtiene haciendo una sola fiesta con todas las amigas de $\mathcal{A}$, podemos tomar $\mathcal{B} = \mathcal{A}$ y $C = \emptyset$. Por otro lado, si el valor óptimo se obtiene haciendo dos o más fiestas, podemos tomar una de esas fiestas como $\mathcal{B}$, y la unión de todas las amigas en fiestas restantes como $\mathcal{C}$. Luego, como amigas que asisten a fiestas distintas no aportan diversión alguna, $g(\mathcal{A}) = g(\mathcal{B}) + g(\mathcal{C})$.
+\end{itemize}
+
+En la Observación 2 se asume, aunque no se explicita, la existencia de una solución óptima al problema para un conjunto finito dado, porque hay solo finitas particiones de un conjunto. De todas formas, esto puede verse trivialmente, dado que alcanza con tomar $N := \# \mathcal{A}$ fiestas distintas para separar a todas las amigas, para luego acotar la cantidad de particiones burdamente por $N^N < \infty $.
+
+La importancia de la segunda observación radica en que ahora podemos deducir la siguiente fórmula para $\boxed{g(\mathcal{A}) = \underset{\mathcal{B} \overset{d}{\cup} C = \mathcal{A}}{\text{max}} g(\mathcal{B}) + g(\mathcal{C})}$. Notemos entonces que para cada elección de $\mathcal{B}$, nos queda determinado $C = \mathcal{A} \setminus \mathcal{B}$, y solamente hay $2^N$ elecciones posibles de $\mathcal{B}$.
+
+\begin{itemize}
+	\item \textbf{Observación 3} : la elección $\mathcal{B} = \mathcal{B}_0$ y $\mathcal{C} = \mathcal{A} \setminus \mathcal{B}_0$ es idéntica a $\mathcal{B} = \mathcal{A} \setminus \mathcal{B}_0$ y $\mathcal{C} = \mathcal{B}_0$, pues basta renombrar $\mathcal{B}$ y $\mathcal{C}$. Esto nos da que basta en realidad con $2^{N-1}$ formas de elegir $\mathcal{B}$.
+\end{itemize}
+
+Esto nos da la pauta de la recursión clave que nos permitirá resolver el problema. Si uno lo ve con ojos más implementativos, debería hacernos ruido en la fórmula obtenida, pues estaríamos llamando recursivamente a $g(\mathcal{A})$ para calcular $g(\mathcal{A})$. Ahora, solamente lo utilizamos (observación 2) si el óptimo se alcanza haciendo una fiesta con todas las amigas de $\mathcal{A}$. Si llamamos entonces $d$ a la función que calcula la diversión que aporta un conjunto de amigas, nos queda:
+
+$$ \boxed{g(\mathcal{A}) =  \text{max} \left \{ d(\mathcal{A}),\underset{\mathcal{B} \subset \mathcal{A}, \mathcal{B} \neq \emptyset, \mathcal{C} = \mathcal{A} \setminus \mathcal{B}}{\text{max}} g(\mathcal{B}) + g(\mathcal{C}) \right \} } \quad  (\mathbf{A}) $$
+
+
+\subsection*{Detalles de implementación}
+
+Primero que nada debemos decidir cómo representar a nuestros conjuntos en el problema. Llamemos al igual que antes $ N := \# \mathcal{A}$, luego, vamos a usar el desarrollo binario (ampliado con ceros hasta $N$ cifras) de los números desde $0$ hasta $2^N$ (inclusive el $0$, exclusive $2^N$) para representar a todo subconjunto de $\mathcal{A}$. Lo que vimos en clase con el nombre de \textbf{máscara de bits}.
+
+\begin{itemize}
+	\item \textbf{Ejemplo} : Si $\mathcal{A} = \left \{ A_1, A_2, A_3, A_4 \right \}$, entonces $ N = 4$, y si queremos representar al subconjunto $ \left \{ A_1, A_3 \right \}$, lo representamos con el número $5$, pues $(5)_2 = 0101$, donde la $i-$ésima posición de derecha a izquierda representa si está o no la amiga $A_i$, por ejemplo, la cifra menos significativa, representa que $A_1$ se encuentra en el subconjunto.
+\end{itemize}
+
+Originalmente tenemos al conjunto $\mathcal{A}$ con todas las amigas de Lisa, lo cual se representa con el número $2^N-1$. Al llamar a la recursión dada por $(\mathbf{A})$ sucesivamente, hay muchas instancias que se solapan, y no queremos tener que volver a calcularlas nuevamente, pues sería ineficiente. Esto nos da la pauta de que podemos utilizar \textbf{programación dinámica} para no recalcular $g(\mathcal{J})$ muchas veces (con $\mathcal{J}$ algún subconjunto de $\mathcal{A}$).
+
+\begin{itemize}
+	\item \textbf{Ejemplo} : Consideremos la siguiente instancia posible.
+	
+	 $$\overset{\mathcal{B}_1}{\overbrace{100}} \overset{\mathcal{C}_1}{\overbrace{\underset{\mathcal{J}}{\underbrace{111111}}0001}}$$
+	
+	$$\underset{\mathcal{B}_2}{\underbrace{100\overset{\mathcal{J}}{\overbrace{111111}}}}\underset{\mathcal{C}_2}{\underbrace{0001}}$$
+	
+	En este caso, para resolver $g(\mathcal{C}_1)$ tuvimos que calcular (entre otras cosas) $g(\mathcal{J})$. Si no nos guardamos este resultado, luego, cuando se quiera calcular $g(\mathcal{B}_2)$ tendríamos que calcular $g(\mathcal{J})$ nuevamente, evidenciando la ineficiencia.
+\end{itemize} 
+
+\subsection*{Algoritmo}
+
+
+\subsection*{Análisis de Complejidad}
+
+\subsection*{Ejemplos}
