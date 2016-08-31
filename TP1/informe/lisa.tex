@@ -34,7 +34,7 @@ La importancia de la segunda observación radica en que ahora podemos deducir la
 	\item \textbf{Observación 3} : la elección $\mathcal{B} = \mathcal{B}_0$ y $\mathcal{C} = \mathcal{A} \setminus \mathcal{B}_0$ es idéntica a $\mathcal{B} = \mathcal{A} \setminus \mathcal{B}_0$ y $\mathcal{C} = \mathcal{B}_0$, pues basta renombrar $\mathcal{B}$ y $\mathcal{C}$. Esto nos da que basta en realidad con $2^{N-1}$ formas de elegir $\mathcal{B}$.
 \end{itemize}
 
-Esto nos da la pauta de la recursión clave que nos permitirá resolver el problema. Si uno lo ve con ojos más implementativos, debería hacernos ruido en la fórmula obtenida, pues estaríamos llamando recursivamente a $g(\mathcal{A})$ para calcular $g(\mathcal{A})$. Ahora, solamente lo utilizamos (observación 2) si el óptimo se alcanza haciendo una fiesta con todas las amigas de $\mathcal{A}$. Si llamamos entonces $d$ a la función que calcula la diversión que aporta un conjunto de amigas, nos queda:
+Esto nos da la pauta de la recursión clave que nos permitirá resolver el problema. Si uno lo ve con ojos más implementativos, debería hacernos ruido en la fórmula obtenida, que estaríamos llamando recursivamente a $g(\mathcal{A})$ para calcular $g(\mathcal{A})$. Ahora, solamente lo utilizamos (observación 2) si el óptimo se alcanza haciendo una fiesta con todas las amigas de $\mathcal{A}$. Si llamamos entonces $d$ a la función que calcula la diversión que aporta un conjunto de amigas, nos queda:
 
 $$ \boxed{g(\mathcal{A}) =  \text{max} \left \{ d(\mathcal{A}),\underset{\mathcal{B} \subset \mathcal{A}, \mathcal{B} \neq \emptyset, \mathcal{C} = \mathcal{A} \setminus \mathcal{B}}{\text{max}} g(\mathcal{B}) + g(\mathcal{C}) \right \} } \quad  (\mathbf{A}) $$
 
@@ -66,9 +66,9 @@ Originalmente tenemos al conjunto $\mathcal{A}$ con todas las amigas de Lisa, lo
 Por simplicidad, en las funciones a definir se consideran como globales (y no se pasan como parámetros) a:
 
 \begin{enumerate}
-	\item El conjunto original $\mathcal{A}$, y su cardinal $N = \# \mathcal{A}$
+
 	\item La matriz $D \in \mathbf{Z}^{N \times N}$ que indica la diversión que aporta cada pareja de amigas en una misma fiesta.
-	\item Un arreglo de enteros de largo $2^N$ que llamaremos $\texttt{dp}$. En $dp(i)$ al finalizar el algoritmo qudará guardada la solución al problema del conjunto que representa la máscara de bits $i$.
+	\item Un arreglo de enteros de largo $2^N$ que llamaremos $\textsc{dp}$. En $\textsc{dp}(i)$ al finalizar el algoritmo quedará guardada la solución al problema del conjunto que representa la máscara de bits $i$.
 \end{enumerate}  
 
 \subsubsection*{Funciones Auxiliares}
@@ -76,7 +76,7 @@ Por simplicidad, en las funciones a definir se consideran como globales (y no se
 \begin{itemize}
 	\item \texttt{cantidadAmigas} $ : \mathbf{Z} \rightarrow \mathbf{Z}$
 	
-	Dado un entero \texttt{mask}, que representa un conjunto de amigas calcula la cantidad de amigas que hay en el conjunto representado (o sea, la cantidad de bits encendidos).
+	Dado un entero \textsc{mask}, que representa un conjunto de amigas calcula la cantidad de amigas que hay en el conjunto representado (o sea, la cantidad de bits encendidos).
 
 	\item \texttt{diversion} $ : \mathbf{Z} \rightarrow \mathbf{Z}$
 	
@@ -84,7 +84,7 @@ Por simplicidad, en las funciones a definir se consideran como globales (y no se
 	
 	\item \texttt{best} $ : \mathbf{Z} \rightarrow \mathbf{Z}$
 	
-	Calcula la solución a la instancia dada por el conjunto que representa \texttt{mask}, utilizando la recursión $(\mathbf{A})$ vista en la sección anterior, y a la vez llena al arreglo \texttt{dp} según su especificación.
+	Calcula la solución a la instancia dada por el conjunto que representa \textsc{mask}, utilizando la recursión $(\mathbf{A})$ vista en la sección anterior, y a la vez llena al arreglo \textsc{dp} según su especificación.
 \end{itemize}
 
 \subsubsection*{Algoritmo}
@@ -94,7 +94,11 @@ Por simplicidad, en las funciones a definir se consideran como globales (y no se
 	\item Llamamos a \texttt{best}$(2^N - 1)$ y devolvemos su respuesta. 
 \end{enumerate}
 
- Notar que $(2^N-1)_2 = \overset{N}{\overbrace{111\dots111}}$, representa el conjunto con todas las amigas.
+\begin{itemize}
+	\item \textbf{Comentario 1} : Notar que $(2^N-1)_2 = \overset{N}{\overbrace{111\dots111}}$, representa el conjunto con todas las amigas
+	\item \textbf{Comentario 2} : Haciendo $N$ fiestas separadas (una por amiga), se consigue una diversión total de $0$, por lo que $-1$ jamás será solución a una instancia del problema.
+\end{itemize}
+
  
  Como podemos ver, el algoritmo en sí radica en la implementación de la función $\texttt{best}$
 
@@ -112,8 +116,9 @@ Por simplicidad, en las funciones a definir se consideran como globales (y no se
 	\end{matrix}$
 	
 	$\texttt{devolver} \; \textsc{ans}$
-	
-	$\boxed{\text{ACÁ VA EL ANÁLISIS DE COMPLEJIDAD DE ESTA FUNCIÓN}}$
+\end{itemize}	
+	Como en cada iteración \textsc{mask} se divide por dos, y se realizan cálculos en $\mathcal{O}(1)$, la función nos queda $\mathcal{O}(\text{log}_2(\textsc{mask}))$. Usando que $ \textsc{mask} \leq 2^N $, la complejidad nos queda $\mathcal{O}(N)$.
+\begin{itemize}
 	
 	\item \texttt{diversion} $ (\textsc{mask} \in \mathbf{Z}) $
 	
@@ -133,6 +138,51 @@ Por simplicidad, en las funciones a definir se consideran como globales (y no se
 	
 	$\textsc{ans} \leftarrow 0$
 	
+	\texttt{para cada par } (i,j) \texttt{ de amigas en} \textsc{indiceAmigas}:
+	
+	\quad $\textsc{ans} \leftarrow \textsc{ans} + D_{i,j}$
+	
+	\texttt{devolver} \textsc{ans}
+
 \end{itemize}
 
-\subsection*{Ejemplos}
+	El análisis de la primer parte de la función es análogo al caso anterior. La complejidad de la segunda parte, es cuadrática en el largo de $\textsc{indiceAmigas}$, como $\# \textsc{indiceAmigas} \leq N$, en total la función nos queda con una complejidad de $\mathcal{O}(N) + \mathcal{O}(N^2)$, lo cual es $\mathcal{O}(N^2)$.
+	
+\begin{itemize}
+	
+	\item $\texttt{best}(\textsc{mask} \in \mathbf{Z})$
+	
+	$\texttt{si } \textsc{dp(mask)} = -1:$
+	
+	\quad 	$\texttt{si cantidadAmigas}(\textsc{mask}) \leq 1:$
+	
+	\quad \quad $ \textsc{dp(mask)} \leftarrow 0$
+	
+	\quad \texttt{sino}:
+	
+	\quad \quad $ \textsc{dp(mask)} \leftarrow \texttt{diversion}(\textsc{mask})$
+	
+	\quad \quad $ \texttt{para cada } \textsc{mask}_1 \texttt{ que representa un sobconjunto propio del de } \textsc{mask}:$
+	
+	\quad \quad \quad $\texttt{si } \textsc{mask}_1 > \textsc{mask}_1^c:$
+	
+	\quad \quad \quad \quad $\textsc{dp(mask)} \leftarrow \text{max} \left  \{ \textsc{dp(mask)}, \texttt{best}(\textsc{mask}_1) + \texttt{best}(\textsc{mask}_1^c)  \right \} $
+	
+	$\texttt{devolver} \textsc{dp(mask)}$
+	
+\end{itemize}	
+
+	Donde $\textsc{mask}_1^c$ indica al complemento de $\textsc{mask}_1$ relativo a $\textsc{mask}$. Por ejemplo, si $\textsc{mask} = 101101$, y $\textsc{mask}_1 = 100100$, entonces $\textsc{mask}_1^c = 001001$ (y NO es $011011$, que sería el complemento del conjunto que representa). Si se quiere se puede pensar como el complemento del conjunto, intersecado con el conjunto que representa $\textsc{mask}$.
+	
+	Otra aclaración es que la línea $" \texttt{si } \textsc{mask}_1 > \textsc{mask}_1^c:"$, se condice con la observación 3 que vimos más arriba en el trabajo.
+	
+	Finalmente, el análisis de complejidad para esta función radica en la cantidad de veces que se llama a la función \texttt{best} (pues luego se hace una comparación en $\mathcal{O}(1)$ al tomar máximo). Para ello, notemos que hay dos casos bien marcados en el código. 
+	\begin{enumerate}
+		\item $\textsc{dp(mask)} = -1$
+		\item $\textsc{dp(mask)} \neq -1$
+	\end{enumerate}
+
+	Notemos que una vez realizado este llamado, se actualiza el valor de $\textsc{dp(mask)}$, por un número mayor o igual que $0$ por el comentario 2 que vimos más arriba, de donde se desprende que en el próximo llamado a $\texttt{best}(\textsc{mask})$ estaremos en el segundo caso.	
+	
+	Por cada una de las $2^N$ máscaras distintas, se hace un llamado a $\texttt{best}$ por cada subconjunto propio del conjunto que representa, pero solo la primera vez que se llama a cada máscara se incurre en una complejidad de $\mathcal{O})(N^2)$, en el resto de los casos se resuelven en $\mathcal{O}(1)$. Sabiendo que hay $\binom{N}{k}$ máscaras que representan conjuntos de $k$ amigas, y que $\# \mathcal{P}(\mathcal{A}) = 2^{\# \mathcal{A}}$, por lo visto en clase, sumado a la sugerencia del trabajo práctico, nos queda que la complejidad del algoritmo es:
+	$$ \mathcal{O} \left ( 2^N \cdot N^2 + \sum_{k = 1}^N \binom{N}{k} \cdot 2^k \right ) = \mathcal{O}\left (2^N \cdot N^2 + 3^N \right ) = \boxed{ \mathcal{O}(3^N)} $$
