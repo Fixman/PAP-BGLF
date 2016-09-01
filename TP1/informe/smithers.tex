@@ -41,11 +41,17 @@ los productos de
 todos los subarreglos de largo exactamente $L$ eficientemente y verificar si alguno de ellos 
 es igual a $M$. \\
 
+Para esto, separamos el algoritmo en 2 partes:
+\begin{enumerate}
+\item Un precómputo 
+\item Cálculo de los productos de los subarreglos de largo $L$
+\end{enumerate}
+
 \subsubsection{Algoritmo: precómputo}
 
 Llamaremos $A$ al arreglo original de las $N$ matrices. 
 Sea $K$ el máximo natural tal que $2^K <= N$, entonces $K \in O(log N)$. Crearemos un arreglo 
-bidimensional de matrices llamado \texttt{productos[][]} de tamaño $N \times K$, de modo que 
+bidimensional de matrices llamado \texttt{productos[][]} de tamaño $N \times (K+1)$, de modo que 
 \texttt{productos[][]} tiene tamaño $O(N log N)$. 
 
 Lo que querremos almacenar en \texttt{productos[i][j]} será \textbf{el producto del subarreglo que 
@@ -56,13 +62,44 @@ Cabe notar que en el caso de que $i+2^j$ exceda al tamaño del arreglo ($N$),
 la última matriz $A_n$ (esto será así, por ejemplo, para todos los valores \texttt{productos[N][j]} dado 
 que ya empiezan en la matriz $A_n$). \\
 
-Ahora definimos la siguiente recursión para calcular los valores de \texttt{productos[][]}: 
+Si tenemos por ejemplo 4 matrices, $A_0, A_1, A_2, A_3$, lo que 
+querremos calcular en \texttt{productos[][]} sería lo siguiente (como tenemos $N=4$ 
+matrices, $K$ sería 2 en este caso):\\
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{l l}
+\texttt{productos[0][0]} = &$A_0$\\
+\texttt{productos[1][0]} = &$A_1$\\
+\texttt{productos[2][0]} = &$A_2$\\
+\texttt{productos[3][0]} = &$A_3$\\
+\texttt{productos[0][1]} = &$A_0 \times A_1$\\
+\texttt{productos[1][1]} = &$A_1 \times A_2$\\
+\texttt{productos[2][1]} = &$A_2 \times A_3$\\
+\texttt{productos[3][1]} = &$A_3$\\
+\texttt{productos[0][2]} = &$A_0 \times A_1 \times A_2 \times A_3$\\
+\texttt{productos[1][2]} = &$A_1 \times A_2 \times A_3$\\
+\texttt{productos[2][2]} = &$A_2 \times A_3$\\
+\texttt{productos[3][2]} = &$A_3$
+\end{tabular}
+\end{center}
+\caption{Ejemplo del arreglo \texttt{productos[][]}}
+\end{table}
+
+Ahora, si bien necesitamos calcular $O(N log N)$ valores en \texttt{productos[][]}, 
+si para cada uno de ellos hacemos todos los productos de las matrices involucradas, 
+podríamos estar haciendo $O(N)$ productos solo para un valor, y no sería aceptable 
+para la complejidad que queremos lograr. Pero podemos usar programación dinámica para 
+calcular los valores de \texttt{productos[][]} de un determinado exponente, en base 
+a los de exponentes más chicos.\\
+
+Definimos la siguiente recursión para calcular los valores de \texttt{productos[][]}: 
 
 \begin{align*}
 productos[i][j] =
 	&\begin{cases}
 		A_i & \text{si $j=0$} \\
-		productos[i][j-1] \times productos[i+2^{j-1}][j-1] & \text{si $j>0$ y $i+2^{j-1}<=N$} \\
+		productos[i][j-1] \times productos[i+2^{j-1}][j-1] & \text{si $j>0 \wedge i+2^{j-1}<=N$} \\
 		productos[i][j-1] & \text{caso contrario} \\
 	\end{cases} \\
 \end{align*}
