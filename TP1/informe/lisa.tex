@@ -1,7 +1,7 @@
 \newpage{}
-\section*{El cumpleaños de Lisa}
+\section{El cumpleaños de Lisa}
 
-\subsection*{Descripción del Problema}
+\subsection{Descripción del Problema}
 
 El enunciado puede resumirse de la siguiente forma. Inicialmente tenemos un conjunto de $N$ amigas de Lisa (donde $ 1 \leq N \leq 18$) y además se tiene una matriz, llamémosla $D \in \mathbf{Z}^{N \times N}$, donde $D_{i,j}$ indica la diversión que aporta la pareja de amigas $A_i$ y $A_j$ en caso de concurrir a una misma fiesta (notar que puede ser negativa).
 
@@ -11,7 +11,7 @@ Ahora, podemos definir la diversión de una partición, como la suma de las dive
 
 Teniendo todo esto definido, la consigna del problema se resume en hallar la diversión óptima que puede tener una partición del conjunto de $N$ amigas original. 
 
-\subsection*{Solución propuesta al problema}
+\subsection{Solución propuesta al problema}
 
 La idea será describir la solución para un conjunto de amigas en función de sus subconjuntos. Para ello, notemos primero las siguientes observaciones:
 
@@ -39,7 +39,7 @@ Esto nos da la pauta de la recursión clave que nos permitirá resolver el probl
 $$ \boxed{g(\mathcal{A}) =  \text{max} \left \{ d(\mathcal{A}),\underset{\mathcal{B} \subset \mathcal{A}, \mathcal{B} \neq \emptyset, \mathcal{C} = \mathcal{A} \setminus \mathcal{B}}{\text{max}} g(\mathcal{B}) + g(\mathcal{C}) \right \} } \quad  (\mathbf{A}) $$
 
 
-\subsection*{Detalles de implementación}
+\subsection{Detalles de implementación}
 
 Primero que nada debemos decidir cómo representar a nuestros conjuntos en el problema. Llamemos al igual que antes $ N := \# \mathcal{A}$, luego, vamos a usar el desarrollo binario (ampliado con ceros hasta $N$ cifras) de los números desde $0$ hasta $2^N$ (inclusive el $0$, exclusive $2^N$) para representar a todo subconjunto de $\mathcal{A}$. Lo que vimos en clase con el nombre de \textbf{máscara de bits}.
 
@@ -59,9 +59,9 @@ Originalmente tenemos al conjunto $\mathcal{A}$ con todas las amigas de Lisa, lo
 	En este caso, para resolver $g(\mathcal{C}_1)$ tuvimos que calcular (entre otras cosas) $g(\mathcal{J})$. Si no nos guardamos este resultado, luego, cuando se quiera calcular $g(\mathcal{B}_2)$ tendríamos que calcular $g(\mathcal{J})$ nuevamente, evidenciando la ineficiencia.
 \end{itemize} 
 
-\subsection*{Implementación del Algoritmo}
+\subsection{Implementación del Algoritmo}
 
-\subsubsection*{Variables globales}
+\subsubsection{Variables globales}
 
 Por simplicidad, en las funciones a definir se consideran como globales (y no se pasan como parámetros) a:
 
@@ -71,7 +71,7 @@ Por simplicidad, en las funciones a definir se consideran como globales (y no se
 	\item Un arreglo de enteros de largo $2^N$ que llamaremos $\textsc{dp}$. En $\textsc{dp}(i)$ al finalizar el algoritmo quedará guardada la solución al problema del conjunto que representa la máscara de bits $i$.
 \end{enumerate}  
 
-\subsubsection*{Funciones Auxiliares}
+\subsubsection{Funciones Auxiliares}
 
 \begin{itemize}
 	\item \texttt{cantidadAmigas} $ : \mathbf{Z} \rightarrow \mathbf{Z}$
@@ -87,7 +87,7 @@ Por simplicidad, en las funciones a definir se consideran como globales (y no se
 	Calcula la solución a la instancia dada por el conjunto que representa \textsc{mask}, utilizando la recursión $(\mathbf{A})$ vista en la sección anterior, y a la vez llena al arreglo \textsc{dp} según su especificación.
 \end{itemize}
 
-\subsubsection*{Algoritmo}
+\subsubsection{Algoritmo}
 
 \begin{enumerate}
 	\item Cargamos los datos de entrada (el entero $N$ y la matriz $D \in \mathbf{Z}^{N \times N}$, e inicializamos el arreglo \texttt{dp} con largo $2^N$ y un $-1$ en cada lugar.
@@ -102,7 +102,7 @@ Por simplicidad, en las funciones a definir se consideran como globales (y no se
  
  Como podemos ver, el algoritmo en sí radica en la implementación de la función $\texttt{best}$
 
-\subsection*{Implementación y Análisis de Complejidad}
+\subsection{Implementación y Análisis de Complejidad}
 \begin{itemize}
 	\item \texttt{cantidadAmigas}$(\textsc{mask} \in \mathbf{Z})$
 	
