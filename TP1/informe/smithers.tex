@@ -142,6 +142,76 @@ cada valor es $O(1)$. Como vimos antes, \texttt{productos[][]} tiene tamaño $O(
 de modo que todo el precómputo lleva $O(N log N)$. 
 
 \subsubsection{Algoritmo: cálculo de los subarreglos de longitud $L$}
+Nos queda ahora calcular efectivamente los productos de los subarreglos de largo $L$ 
+dentro de $A$. Para esto usaremos el arreglo \texttt{productos[][]} ya explicado, junto con 
+el desarrollo binario de $L$. 
+
+Como sabemos, un número $L$ tendrá $O(log L)$ bits en su desarrollo binario. La idea entonces 
+será la siguiente: así como podemos formar $L$ con $O(log L)$ bits, podemos formar el producto 
+de un subarreglo de largo $L$ con $O(log L)$ productos 
+de elementos ya calculados en \texttt{productos[][]}.\\
+
+Así como los bits de $L$ representan potencias de 2 que tenemos que sumar para formar el número, 
+en nuestro arreglo guardamos productos de subarreglos de largo potencias de 2 también. El 
+algoritmo será el siguiente: \\
+
+$\textsc{SubArreglosDeL} \leftarrow \textsc{[]}$
+
+$B \leftarrow \textsc{BitsEn1(L)}$
+
+$\texttt{para cada} \; \textsc{i} \; \in \; [ 0, \; \; N-L]:$
+
+\quad $\textsc{j} \leftarrow \textsc{i}$ 
+
+\quad $\textsc{MatrizResultado} \leftarrow \textsc{MatrizIdentidad}$
+
+\quad $\texttt{para cada} \; b \; \texttt{en} \; B:$
+
+\quad \quad $\textsc{MatrizResultado} \leftarrow \textsc{MatrizResultado} \times \textsc{productos[j][}b\textsc{]}$
+
+\quad \quad $\textsc{j} \leftarrow \textsc{j} + 2^{b}$ 
+
+\quad $\textsc{SubArreglosDeL.agregar} \textsc{(MatrizResultado)}$\\
+
+La función \textsc{BitsEn1} toma un entero $X$ y devuelve los índices 
+de los bits de $X$ que se encuentran en 1. Por ejemplo \textsc{BitsEn1(5) = [0,2]} por $5 = 2^0 + 2^2$, 
+\textsc{BitsEn1(10) = [1,3]} porque $10 = 2^1 + 2^3$.\\
+
+La idea será: iteramos $i$ desde 0 hasta $N-L$, que representa dónde comienza un nuevo producto 
+de largo $L$. En un arreglo de $N$ elementos, en total hay $N-L+1$ subarreglos de largo $L$. 
+
+Para cada iteración, comenzamos el resultado como la matriz identidad (que es el elemento neutro 
+para el producto de matrices), y tomamos otro índice $j$ que comenzará en $i$ (el principio del subarreglo). 
+Luego vamos iterando sobre índices de los bits de $L$ que se encuentran en 1. 
+
+%La idea es, para cada uno de los productos que queremos formar (que son $N-L+1$ en total), comenzamos 
+%con un índice que comienza en $i$ (el primer elemento del subarreglo que queremos calcular). 
+
+Sea $b$ uno de estos índices. 
+Como tenemos $b$, quiere decir que deberíamos sumar $2^b$ para obtener $L$. De igual manera, para 
+formar el subarreglo de largo $L$ usando subarreglos de largo potencias de 2, 
+debemos multiplicar nuestro resultado un producto de largo $2^b$. Tomamos entonces \texttt{productos[j][b]} 
+e incrementamos $j$ en $2^b$, porque ya agregamos esa cantidad de elementos a nuestro resultado. 
+Al haber iterado sobre todos los $b$ tendremos como resultado el producto matricial del subarreglo que 
+comienza en $i$ de largo $L$. \\
+
+Por ejemplo, si tenemos 8 matrices, y queremos calcular el subarreglo de largo 5 que comienza en $A_3$, 
+haríamos lo siguiente: 
+\begin{itemize}
+\item Tomamos los bits en 1 de 5, que son \textsc{[0,2]}, e iniciamos $j$ en 3.
+\item Agregamos al resultado a \texttt{productos[3][0]}, y sumamos $2^0=1$ a $j$. $j=4$ ahora. 
+\item Agregamos al resultado a \texttt{productos[4][2]}, y sumamos $2^2=4$ a $j$. $j=8$ ahora. 
+\item Luego terminamos porque no hay más bits que procesar, y agregamos el resultado. 
+\end{itemize}
+
+$$\underset{resultado}{\underbrace{\overset{productos[3][0]}{\overbrace{A_3}} \times \overset{productos[4][2]}{\overbrace{A_4 \times A_5 \times A_6 \times A_7}}}}$$\\
+
+Finalmente, habiendo obteniedo todos los productos de subarreglos de largo $L$, iteramos sobre cada 
+uno de estos y comparamos si alguno es igual a $M$. Podemos ver que hay $O(N)$ subarreglos de largo $L$, 
+y que constuir cada uno nos lleva $O(log L) = O(log N)$ ($L \leq N$) porque usamos esa cantidad de elementos de 
+\texttt{productos[][]}, y los productos y el resto de las operaciones son constantes. Entonces 
+en total construir todos los productos de largo $L$ nos lleva $O(N log N)$ más otro $O(N log N)$ 
+por el precómputo, y finalmente la complejidad total del algoritmo es $O(N log N)$. 
 
 \newpage
 \subsection{Código de la solución}
