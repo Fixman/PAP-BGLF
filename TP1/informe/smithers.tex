@@ -2,7 +2,7 @@
 \section{El error de Smithers}
 \subsection{Descripción del problema}
 Dadas una matriz $M\in Z_p$ ($p$ es 10007, el cual es primo), un arreglo 
-de N matrices en $Z_p$ (todas las matrices son de $3 \times 3$), 
+$A$ de $N$ matrices en $Z_p$ (con todas las matrices son de $3 \times 3$), 
 y un entero $L$ ($1 <= L <= N$), determinar si existe algún subarreglo 
 de longitud exactamente $L$ cuyo producto matricial 
 sea igual a $M$. 
@@ -10,7 +10,7 @@ sea igual a $M$.
 Cabe notar que con subarreglo nos referimos a que debe ser una 
 subsecuencia contigua del arreglo original. 
 
-Para una instancia de este problema, se pide sólamente devolver ``SI'' en 
+Para una instancia de este problema, se pide devolver ``SI'' en 
 caso de que exista algún subarreglo de largo $L$ cuyo producto sea $M$, o devolver 
 ``NO'' en caso contrario. Cada instancia debe ser resuelta con complejidad temporal 
 $O(N log N)$, con $N$ 
@@ -26,10 +26,10 @@ hora de plantear soluciones:
     hacerse (es decir, las dimensiones de las matrices coinciden). Más aún, al ser matrices 
     de tamaño fijo, podemos considerar que hacer el producto entre 2 matrices tiene 
     complejidad $O(1)$. 
-    \item No se nos garantiza que las matrices sean inversibles. Si bien, las matrices 
-    pertenecen a $Z_p$ con $p$ primo, podríamos tener una matriz directamente nula. 
+    \item Aunque las matrices pertenecen a $Z_p$ con $p$ primo, 
+    no podemos plantear una solución que utilice algún tipo de inverso de las matrices. 
     De modo que no será viable un algoritmo que asuma que las matrices son inversibles para 
-    así ``dividir'' matrices (o multiplicar por el inverso). De modo que no tenemos inverso para la 
+    así ``dividir'' matrices (o multiplicar por el inverso). Por tanto no tenemos inverso para la 
     operación de multiplicar matrices. De sí tenerlo, el problema podría ser resuelto con 
     otras complejidades aún mejores incluso. 
 \end{enumerate}
@@ -50,7 +50,7 @@ Para esto, separamos el algoritmo en 2 partes:
 \subsubsection{Algoritmo: precómputo}
 
 Llamaremos $A$ al arreglo original de las $N$ matrices. 
-Sea $K$ el máximo natural tal que $2^K <= N$, entonces $K \in O(log N)$. Crearemos un arreglo 
+Sea $K$ el máximo entero no negativo tal que $2^K <= N$, entonces $K \in O(log N)$. Crearemos un arreglo 
 bidimensional de matrices llamado \texttt{productos[][]} de tamaño $N \times (K+1)$, de modo que 
 \texttt{productos[][]} tiene tamaño $O(N log N)$. 
 
@@ -99,7 +99,7 @@ Definimos la siguiente recursión para calcular los valores de \texttt{productos
 productos[i][j] =
 	&\begin{cases}
 		A_i & \text{si $j=0$} \\
-		productos[i][j-1] \times productos[i+2^{j-1}][j-1] & \text{si $j>0 \wedge i+2^{j-1}<=N$} \\
+		productos[i][j-1] \times productos[i+2^{j-1}][j-1] & \text{si $j>0 \wedge i+2^{j-1}<N$} \\
 		productos[i][j-1] & \text{caso contrario} \\
 	\end{cases} \\
 \end{align*}
@@ -108,7 +108,7 @@ Con esto queremos decir lo siguiente:
 \begin{itemize}
 \item Los productos con $j=0$ son los de longitud $2^0=1$, es decir, 
 son simplemente $A_i$. Son nuestro caso base. 
-\item Si $j>0$, la idea es que podamos formar el producto de largo $2^j$ 
+\item Si $j>0$, la idea es que podemos formar el producto de largo $2^j$ 
 usando 2 productos ya calculados de largo $2^{j-1}$. Esto tiene sentido 
 porque $2 \times 2^{j-1} = 2^j$. Es decir, que para conseguir el producto 
 que comienza en $i$ de largo $2^j$ deberíamos usar: 
@@ -121,15 +121,21 @@ que comienza en $i$ de largo $2^j$ deberíamos usar:
 
 De esta manera, obteniendo $X$ e $Y$ correctamente, no habrá solapamiento entre ellos 
 y tampoco dejaremos elementos de $A$ fuera, y podremos calcular \texttt{productos[i][j]} 
-como $X \times Y$. 
+como $X \times Y$. \\
 
-Puede ocurrir que $Y$ no exista, porque el índice en el cual comience este producto 
-($i+2^{j-1}$) caiga fuera del arreglo, o sea, que sea mayor a $N$. En este caso, 
+En el ejemplo anterior tendríamos lo siguiente para el caso de calcular \texttt{productos[0][2]}:
+
+$$\underset{productos[0][2]}{\underbrace{\overset{productos[0][1]}{\overbrace{A_0 \times A_1}} \times \overset{productos[2][1]}{\overbrace{A_2 \times A_3}}}}$$
+
+Puede ocurrir que no exista $Y$, porque el índice en el cual debería comenzar $Y$ 
+($i+2^{j-1}$) caiga fuera del arreglo. En este caso, puede verse que 
 solo necesitamos $X$ para conseguir \texttt{productos[i][j]}, porque quiere decir que 
-el producto $X$ ya incluye a $A_n$, de modo que no hay más matrices para agregar. \\
+el producto $X$ ya incluye a la última matriz de $A$ ($A_{n-1}$), 
+de modo que no hay más matrices para agregar. \\
 
 Si calculamos y almacenamos los valores \texttt{productos[][]} en orden 
-creciente de $j$ (es decir, de la longitud), al momento de calcular \texttt{productos[i][j]} 
+creciente de $j$ (es decir, de la longitud de los subarreglos), 
+al momento de calcular \texttt{productos[i][j]} 
 ya tendremos los de \texttt{j-1}, que son los que necesitamos. Calcular cada uno de estos es entonces, 
 usar una de las matrices dadas, o multiplicar 2 matrices que ya calculamos, de modo que 
 cada valor es $O(1)$. Como vimos antes, \texttt{productos[][]} tiene tamaño $O(N log N)$, 
