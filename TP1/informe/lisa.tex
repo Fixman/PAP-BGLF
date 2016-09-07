@@ -130,7 +130,7 @@ Por simplicidad, en las funciones a definir se consideran como globales (y no se
 	
 	\quad $ \texttt{si} \; \textsc{mask} \equiv 1 \pmod{2}$ 
 	
-	\quad \quad $ \textsc{indiceAmigas} \leftarrow [\textsc{indiceAmigas}, \textsc{mask} \pmod{2} ] $ \textit{(agregar al final)}
+	\quad \quad $ \textsc{indiceAmigas.agregar(indice)}$
 	
 	\quad $\textsc{indice} \leftarrow \textsc{indice} - 1$
 	
@@ -176,13 +176,16 @@ Por simplicidad, en las funciones a definir se consideran como globales (y no se
 	
 	Otra aclaración es que la línea $" \texttt{si } \textsc{mask}_1 > \textsc{mask}_1^c:"$, se condice con la observación 3 que vimos más arriba en el trabajo.
 	
-	Finalmente, el análisis de complejidad para esta función radica en la cantidad de veces que se llama a la función \texttt{best} (pues luego se hace una comparación en $\mathcal{O}(1)$ al tomar máximo). Para ello, notemos que hay dos casos bien marcados en el código. 
+	Finalmente, el análisis de complejidad para esta función radica en la cantidad de veces que se llama a la función \texttt{best} (pues luego se hace una comparación en $\mathcal{O}(1)$ al tomar máximo). Para ello, notemos que hay dos casos bien marcados en el algoritmo. 
 	\begin{enumerate}
 		\item $\textsc{dp(mask)} = -1$
 		\item $\textsc{dp(mask)} \neq -1$
 	\end{enumerate}
 
-	Notemos que una vez realizado este llamado, se actualiza el valor de $\textsc{dp(mask)}$, por un número mayor o igual que $0$ por el comentario 2 que vimos más arriba, de donde se desprende que en el próximo llamado a $\texttt{best}(\textsc{mask})$ estaremos en el segundo caso.	
+	Notemos que una vez realizado un llamado del primer caso, se actualiza el valor de $\textsc{dp(mask)}$, por un número mayor o igual que $0$ por el comentario 2 que vimos más arriba, de donde se desprende que en el próximo llamado a $\texttt{best}(\textsc{mask})$ estaremos en el segundo caso.	
 	
-	Por cada una de las $2^N$ máscaras distintas, se hace un llamado a $\texttt{best}$ por cada subconjunto propio del conjunto que representa, pero solo la primera vez que se llama a cada máscara se incurre en una complejidad de $\mathcal{O})(N^2)$, en el resto de los casos se resuelven en $\mathcal{O}(1)$. Sabiendo que hay $\binom{N}{k}$ máscaras que representan conjuntos de $k$ amigas, y que $\# \mathcal{P}(\mathcal{A}) = 2^{\# \mathcal{A}}$, por lo visto en clase, sumado a la sugerencia del trabajo práctico, nos queda que la complejidad del algoritmo es:
+	Por cada una de las $2^N$ máscaras distintas, se hace un llamado a $\texttt{best}$ por cada subconjunto propio del conjunto que representa, pero solo la primera vez que se llama a cada máscara se incurre en una complejidad de $\mathcal{O}(N^2)$, en el resto de los casos se resuelven en $\mathcal{O}(1)$. Sabiendo que hay $\binom{N}{k}$ máscaras que representan conjuntos de $k$ amigas, y que $\# \mathcal{P}(\mathcal{A}) = 2^{\# \mathcal{A}}$, por lo visto en clase, sumado a la sugerencia del trabajo práctico, nos queda que la complejidad del algoritmo es:
 	$$ \mathcal{O} \left ( 2^N \cdot N^2 + \sum_{k = 1}^N \binom{N}{k} \cdot 2^k \right ) = \mathcal{O}\left (2^N \cdot N^2 + 3^N \right ) = \boxed{ \mathcal{O}(3^N)} $$
+	
+\subsection{C\'odigo de la soluci\'on}
+\lstinputlisting[numbers = left]{../src/lisa/lisa.cpp}
