@@ -66,7 +66,7 @@ tint best(vector<tint> &dp, vector<vector<tint> > &d, tint mask)
 	tint n = d.size();
 	if (dp[mask] == -1)
 	{
-		if (cantidadAmigas(mask) == 1) // Caso base
+		if (cantidadAmigas(mask) <= 1) // Caso base
 			dp[mask]  = 0;
 		else
 		{
