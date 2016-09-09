@@ -1,6 +1,6 @@
 \newpage{}
 \section{La Tienda de Apu}
-
+\textbf{Peso del ejercicio: 10}
 \subsection{Soluciones teóricas al problema}
 
 \subsubsection{Backtracking na\"ive}
@@ -75,7 +75,7 @@ Por cada elemento \( q \) de entre los \( t \leq 2^{\left| A \right|} \) element
 
 Usando una estructura de árbol balanceado para representar los conjuntos (como \texttt{set} de C++), la operación de buscar el mayor elemento menor o igual a otro elemento en \( W \) (similar a \texttt{lower\_bound}) tiene complejidad \( \bigO \left( \log \left| W \right| \right) = \bigO \left( \log 2^{\left| B \right|} \right) = \bigO \left( \left| B \right| \right) = \bigO \left( N - \tau \right) \). Como esto se tiene que hacer por cada elemento de \( Q \), la complejidad final del ``merge'' es \( \bigO (2^\tau \cdot (N - \tau)) = \bigO (N \cdot 2^\tau) \).
 
-La complejidad final en tiempo de hacer el merge de los dos conjuntos es \( \bigO(2^\tau + 2^{N - \tau} + N \cdot 2^\tau) = \bigO(2^{N - \tau} + N \cdot 2^\tau) \). Como la exponenciación crece mucho más rápido que la multiplicación, la complejidad menor se alcanza poniendo \( \tau = \nicefrac{1}{2} \). Esta complejidad entonces queda como \( \bigO(2^\frac{1}{2} + N \cdot 2^\frac{1}{2}) = \bigO(N \cdot 2^\frac{1}{2}) \), que esta vez sí cumple con las restricciones del enunciado.
+La complejidad final en tiempo de hacer el merge de los dos conjuntos es \( \bigO(2^\tau + 2^{N - \tau} + N \cdot 2^\tau) = \bigO(2^{N - \tau} + N \cdot 2^\tau) \). Como la exponenciación crece mucho más rápido que la multiplicación, la complejidad menor se alcanza poniendo \( \tau = \nicefrac{N}{2} \). Esta complejidad entonces queda como \( \bigO(2^\frac{N}{2} + N \cdot 2^\frac{N}{2}) = \bigO(N \cdot 2^\frac{N}{2}) \), que esta vez sí cumple con las restricciones del enunciado.
 
 \newpage{}
 
