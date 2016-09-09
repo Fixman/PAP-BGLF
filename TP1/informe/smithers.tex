@@ -1,8 +1,8 @@
 \newpage{}
 \section{El error de Smithers}
 \subsection{Descripción del problema}
-Dadas una matriz $M\in Z_p$ ($p$ es 10007, el cual es primo), un arreglo 
-$A$ de $N$ matrices en $Z_p$ (con todas las matrices son de $3 \times 3$), 
+Dadas una matriz $M\in Z_p^{3 \times 3}$ ($p$ es 10007, el cual es primo), un arreglo 
+$A$ de $N$ matrices en $Z_p^{3 \times 3}$, 
 y un entero $L$ ($1 <= L <= N$), determinar si existe algún subarreglo 
 de longitud exactamente $L$ cuyo producto matricial 
 sea igual a $M$. 
@@ -26,7 +26,7 @@ hora de plantear soluciones:
     hacerse (es decir, las dimensiones de las matrices coinciden). Más aún, al ser matrices 
     de tamaño fijo, podemos considerar que hacer el producto entre 2 matrices tiene 
     complejidad $O(1)$. 
-    \item Aunque las matrices pertenecen a $Z_p$ con $p$ primo, 
+    \item Aunque las matrices pertenecen a $Z_p^{3 \times 3}$ con $p$ primo, 
     no podemos plantear una solución que utilice algún tipo de inverso de las matrices. 
     De modo que no será viable un algoritmo que asuma que las matrices son inversibles para 
     así ``dividir'' matrices (o multiplicar por el inverso). Por tanto no tenemos inverso para la 
