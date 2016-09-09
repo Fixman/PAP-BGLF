@@ -1,9 +1,10 @@
 \newpage{}
 \section{Experimentos nucleares}
+\textbf{Peso del ejercicio: 10}
 \subsection{Soluci\'on teorica del problema}
 El programa toma una lista de numeros enteros y encuentra la m\'axima suma
 de numeros contiguos que se puede obtener, es decir, dado un arreglo
-de $N$ numeros enteros $A_1,\dots, A_N$ encuentra $A_i+\dots+A_j$ ,$j>i$ 
+de $N$ numeros enteros $A_1,\dots, A_N$ encuentra $A_i+\dots+A_j$ ,$j\geq i$ 
 m\'axima. Lo hace de manera golosa pues miro las sumas parciales, truncando
 a cero cuando me paso al negativo, es decir, si $S_j$ es la suma parcial 
 hasta el elemento $j$ entonces $S_{j+1}$ es el m\'aximo entre $S_j+A_{j+1}$ 
@@ -12,13 +13,20 @@ y $0$, hago esto porque no me conviene acarrear valores negativos.
 
 Luego el m\'aximo de las sumas parciales truncadas, a partir de ahora
 lo llamo $maxGlobal$, es la suma contigua m\'axima, pues sino ,es decir, 
-existe $A_i+\dots +A_j$ ,$j>i$, que es mayor estricto que $maxGlobal$. 
-Puedo suponer sin p\'erdida de generalidad que $A_i+\dots +A_k\geq0$ 
+existe $A_i+\dots +A_j$ ,$j\geq i$, que es mayor estricto que $maxGlobal$.
+Notar que $A_i,\dots ,A_j$ no pueden ser todos negativos pues
+$maxGlobal\geq 0$, ya que cada $S_j$ lo es y $maxGlobal$ es el m\'aximo
+de los $S_j$. Tambi\'en notar que $A_j\geq 0$ pues si no $A_i+\dots +A_{j-1}$
+es mayor que $A_i+\dots +A_j$, lo cual es un absurdo pues $A_i+\dots +A_j$
+era la mas grande.
+
+
+Puedo suponer sin p\'erdida de generalidad que $A_i+\dots +A_k\geq 0$ 
 $\forall i\leq k\leq j$, pues si para alg\'un $k$ no lo \'es entonces 
 $A_{k+1}+\dots + A_j>A_i+\dots +A_j$ y repito el argumento con 
 $A_{k+1}+ \dots +A_j$ hasta obtener una suma contigua que no se anule en 
-cada paso. Sea $s$ el m\'inimo \'indice tal que $A_s+\dots+A_k\geq0$ 
-$\forall k\leq j$, entonces
+cada paso. Sea $s$ el m\'inimo \'indice tal que $A_s+\dots+A_k\geq 0$ 
+$\forall s\leq k\leq j$, entonces
 \begin{equation}
 	A_i+\dots +A_j \leq A_s+\dots+A_j = S_{s+j} \leq maxGlobal
 \end{equation}
@@ -28,7 +36,7 @@ luego $maxGlobal$ es la suma contigua m\'axima.
 En el c\'odigo hacemos esto sin guardarnos todos los $S_j$ porque no los 
 necesitamos, solo nos quedamos con el m\'aximo valor de las sumas parciales
 truncadas en cada momento, $maxGlobal$, y la suma contigua truncada maxima
-que termina en el valor actual, $maxEnding$.
+que termina en el valor actual, $maxEnd$.
 
 \subsubsection{Correctitud de la implementaci\'on}
 Hacemos inducci\'on en $N$ para ver que la implementaci\'on es correcta, 
@@ -50,11 +58,26 @@ que termina en $A_N$ respectivamente.
 	en $A_N$, si esta es mayor que $maxGlobal$ entonces $maxGlobal$ toma 
 	este valor sino se queda con el valor anterior. Finaliza la 
 	ejecuci\'on terminando $maxGlobal$ con el m\'aximo global de la 
-	secuencia y $maxEnding$ con la suma m\'as grande que termina en 
+	secuencia y $maxEnd$ con la suma m\'as grande que termina en 
 	$A_N$, como queriamos.
 
 
 La complejidad del codigo es $O(N)$ pues hay un solo bucle for que se
-repite $N$ veces.
+repite $N$ veces y cada iteraci\'on es $O(1)$.
 \subsection{C\'odigo de la soluci\'on}
 \lstinputlisting[numbers = left]{../src/frink/frink.cpp}
+
+\subsection{Casos de prueba}
+
+Se hicieron algunos casos de prueba de casos,
+
+\begin{flushleft}
+\begin{tabulary}{\textwidth}{@{}|L|L|L|@{}}
+\hline
+\textbf{Caso de prueba} & \textbf{Archivo de entrada} & \textbf{Salida esperada} \\
+\hline
+Todos negativos & \lstinputlisting{../src/frink/todoNegativos.in} & \lstinputlisting{../src/frink/todoNegativos.out} \\ \hline
+Entrada nula & \lstinputlisting{../src/frink/entradaNula.in} & \lstinputlisting{../src/frink/entradaNula.out} \\ \hline
+Conviene el del medio & \lstinputlisting{../src/frink/medio.in} & \lstinputlisting{../src/frink/medio.out} \\ \hline
+\end{tabulary}
+\end{flushleft}
