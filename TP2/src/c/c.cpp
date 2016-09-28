@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <stack>
 
 using namespace std;
 
@@ -11,6 +12,7 @@ struct Edge {
 };
 
 typedef vector<int> vi;
+typedef stack<int> si;
 typedef vector<Edge> vEdge;
 
 #define forsn(i,s,n) for(int i=(int)s; i<(int)n; i++)
@@ -21,12 +23,26 @@ vector<vEdge> graph;
 vi low;
 vi depth;
 vector<bool> bridges; 
+vi CCSizes;
+vi CCNodes;
 
 bool DEBUG = true;
 
-void dfs(int v, int d, int p, vi nodes){
+void buildNewCC(int v, si &nodes){
+    int newCC = 0;
+    while(!nodes.empty() && nodes.top() != v){
+        cerr << nodes.top() << endl;
+        CCNodes[nodes.top()] = CCSizes.size();
+        nodes.pop();
+        newCC++;
+    }
+    CCSizes.pb(newCC);
+}
+
+void dfs(int v, int d, int p, si &nodes){
     depth[v] = d;
     low[v] = d;
+    nodes.push(v);
     for(auto adj : graph[v]){
         int w = adj.node;
         if(depth[w] == -1 && w != p){
@@ -36,6 +52,9 @@ void dfs(int v, int d, int p, vi nodes){
                 // Puente
                 bridges[adj.id] = true;
                 if(DEBUG) cerr << "Puente:\n\tArista " << adj.id+1 << "\n\t(" << v+1 << "," << w+1 << ")" << endl;
+                // Construimos la componente conexa sin el puente 
+                buildNewCC(v, nodes);
+                if(DEBUG) cerr << "Nueva CC: " << CCSizes[CCNodes[w]] << endl;
             }
         }else if(w != p){
             low[v] = min(low[v], depth[w]);
@@ -54,9 +73,18 @@ int main(){
     // Preproceso
     depth = vi(N, -1);
     low = vi(N, -1);
-    bridges = vector<bool>(M, false);
-    vi nodes;
-    forn(i,N) if(depth[i] == -1) dfs(i,0,i,nodes);
+	bridges = vector<bool>(M, false);
+    CCSizes = vi(0);
+    CCNodes = vi(N, -1);
+    
+    forn(i,N){ 
+		if(depth[i] == -1){ 
+			si nodes;
+			dfs(i,0,i,nodes);
+            buildNewCC(-1, nodes);
+            if(DEBUG) cerr << "Nueva CC: " << CCSizes[CCNodes[i]] << endl;
+		}
+	}
     // Queries
     int QS; cin >> QS;
     forn(i,QS){
@@ -94,7 +122,7 @@ int main(){
         }else if(qi == 'B'){
             int e; cin >> e; e--; cout << bridges[e] << endl;
         }else if(qi == 'C'){
-            
+            int v; cin >> v; v--; cout << CCSizes[CCNodes[v]]-1 << endl;
         }
     }
     return 0;
