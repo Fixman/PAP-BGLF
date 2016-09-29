@@ -2,7 +2,43 @@
 \section{Problema C: Cortes programados}
 \textbf{Peso del ejercicio: 9}
 \subsection{Descripción del problema}
+Dada una ciudad con $N$ esquinas y $M$ calles bidereccionales que conectan 
+pares de esquinas, donde se puede viajar entre cualquier par de esquinas 
+usando las calles, se pide responder una serie de queries de varios tipos: 
+
+\begin{itemize}
+\item Tipo A: dadas 2 esquinas $e_1$ y $e_2$, dar la cantidad de calles tales que, 
+si cortáramos únicamente esa calle, impediría viajar desde $e_1$ hasa $e_2$. 
+\item Tipo B: dada una calle, devolver si existen al menos 2 esquinas entre las 
+que dejaría de haber camino si cortáramos la calle. 
+\item Tipo C: dada una esquina $e$, devolver la cantidad de esquinas $e_2$ tales que, 
+de cortar una sola calle cualquiera, seguiría habiendo camino entre $e_1$ y $e_2$.
+\end{itemize}
+
+Se nos pide diseñar un algoritmo que resuelva el problema en complejidad temporal 
+$\bigO(M + MQ_A + Q_B + Q_C)$, donde $Q_A$, $Q_B$ y $Q_C$ son las 
+queries de tipo A, B y C respectivamente. 
+
 \subsection{Soluciones al problema}
+Modelaremos la ciudad como un grafo, de la manera clásica, donde los nodos 
+serán las esquinas de la ciudad, y las aristas serán las calles (esto 
+tiene sentido porque las calles conectan \textit{pares} de esquinas). 
+Como sabemos que entre todo par de esquinas hay un camino, esto quiere 
+decir que el grafo que obtenemos es conexo, y por tanto 
+además $\bigO(N) \in \bigO(M)$.
+
+Para resolver el problema, lo que haremos será calcular los \textbf{puentes} 
+en el grafo resultante, y responderemos las queries utilizando información 
+que obtendremos en base a los puentes. 
+
+Veamos cómo se pueden responder los distintos tipos de queries usando 
+los puentes el grafo: 
+\begin{itemize}
+\item Tipo A:
+\item Tipo B:
+\item Tipo C:
+\end{itemize}
+
 \subsection{Algoritmo}
 \newpage
 \subsection{Código de la solución}
