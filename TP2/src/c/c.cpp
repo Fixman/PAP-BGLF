@@ -138,7 +138,7 @@ int main(){
             // 0 en el caso contrario. 
             int e; cin >> e; e--; cout << bridges[e] << endl;
         }else if(qi == 'C'){
-            // Devolvemos el tamaño de la componente conexta libre 
+            // Devolvemos el tamanio de la componente conexta libre 
             // de puentes que contiene a 'v' (menos 1, para no contar 'v').
             int v; cin >> v; v--; cout << CCSizes[CCNodes[v]]-1 << endl;
         }
