@@ -33,9 +33,43 @@ que obtendremos en base a los puentes.
 
 Veamos cómo se pueden responder los distintos tipos de queries usando 
 los puentes el grafo: 
+
 \begin{itemize}
-\item Tipo A:
-\item Tipo B:
+\item Tipo A: La query nos habla de aristas que al ser removidas individualmente 
+impedirían llegar desde $e_1$ hasta $e_2$. De alguna manera nos habla de los puentes 
+del grafo, porque esas son las aristas que al ser removidas aumentan la cantidad de 
+componentes conexas y cortan caminos entre nodos. 
+
+De modo que la query nos habla de los 
+puentes, pero no de todos, sino de \textbf{los puentes que se encuentran 
+en un camino simple desde $e_1$ hasta $e_2$}. 
+
+Si bien puede haber más de un camino simple entre $e_1$ y $e_2$, \textbf{no pueden 
+existir 2 caminos simples que usen distintos puentes}. Si existiesen 2, entonces 
+tendría que haber un ciclo conteniendo a esos puentes, lo cual es un absurdo. 
+De modo que los puentes en un camino simple de $e_1$ a $e_2$ son únicos, y es 
+claro que cumplen con la condición que buscamos porque necesariamente al remover 
+uno quedan separados $e_1$ y $e_2$, de lo contrario habría otro camino que los 
+mantiene conectados y esto haría que el puente pertenezca a un ciclo, que también 
+es un absurdo. 
+
+Para responder las queries entonces teniendo los puentes del grafo precomputados 
+podemos encontrar un camino simple de $e_1$ a $e_2$ con un BFS, y luego 
+iterar sobre dicho camino y contar la cantidad de puentes en el. El BFS 
+siempre encuentra camino (porque el grafo es conexo) y tiene complejidad 
+$\bigO(N+M) = \bigO(M)$. Luego $Q_A$ queries de tipo A tienen complejidad 
+$\bigO(MQ_A)$. 
+
+\item Tipo B: la query nos pide devolver para una arista dada, si al 
+removerla hay al menos 2 nodos que quedan desconectados. Como todos 
+los nodos empiezan conectados por ser el grafo conexo, la única manera de que 
+al remover una arista se desconecten nodos es que aumente la cantidad de componentes 
+conexas, y esto ocurre únicamente al remover un puente (por definición). 
+
+Teniendo los puentes del grafo precomputados, dada una arista podemos responder 
+en $\bigO(1)$ si es o no un puente, luego $Q_B$ queries de tipo B tienen complejidad 
+$\bigO(Q_B)$. 
+
 \item Tipo C:
 \end{itemize}
 
