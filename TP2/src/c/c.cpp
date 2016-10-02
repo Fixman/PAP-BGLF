@@ -72,7 +72,7 @@ int main(){
     CCSizes = vi(N, 0);
     
     // DFS para calcular los puentes
-    forn(i,N) if(depth[i] == -1) dfsBridges(i,0,i);
+    dfsBridges(0,0,0);
     // DFS para calcular las componentes conexas sin puentes
     forn(i,N) if(!visit[i]){
         vi nodes;

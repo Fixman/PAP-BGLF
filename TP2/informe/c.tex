@@ -101,6 +101,69 @@ de las componentes, podemos responder cada query en $\bigO(1)$. Luego $Q_C$ quer
 de tipo B tienen complejidad $\bigO(Q_C)$. \\
 
 \subsection{Algoritmo}
+Describimos a continuación el algoritmo completo en forma de pseudocódigo 
+que resuelve el problema en base a lo presentado en el análisis. 
+
+\begin{algorithm}[H]
+dfsBridges(0,0,0)\;
+\For{cada nodo no visitado}{
+dfsComponents(nodo)\;
+}
+\For{cada query}{
+\If{tipo A}{
+c $\leftarrow$ bfsCaminoSimple(u,v)\;
+\textbf{return} cantidad de puentes en c\;
+}
+\If{tipo B}{
+\textbf{return} si la arista es puente o no\;
+}
+\If{tipo C}{
+\textbf{return} tamaño de la componente de v - 1\;
+}
+}
+\caption{Algoritmo general}
+\end{algorithm}
+
+El siguiente es el pseudocódigo de \texttt{dfsBridges}, que se encarga de calcular 
+los puentes del grafo. 
+
+\begin{algorithm}[H]
+\KwData{v, d, padre}
+profundidad[v] = low[v] = d\;
+\For{cada vecino w de v distinto del padre}{
+    \eIf{profundidad[w] == -1}{
+        dfsBridges(w,d+1,v)\;
+        low[v] = min(low[v], low[w])\;
+        \If{low[w] >= profundidad[w]}{
+            marcar (v,w) como puente\;
+        }
+    }{
+        low[v] = min(low[v], low[w])\;
+    }
+}
+\caption{dfsBridges}
+\end{algorithm}
+
+Y por último el pseudocódigo para calcular las componentes conexas del grafo 
+sin puentes. 
+
+\begin{algorithm}[H]
+\KwData{v, d, padre}
+profundidad[v] = low[v] = d\;
+\For{cada vecino w de v distinto del padre}{
+    \eIf{profundidad[w] == -1}{
+        dfsBridges(w,d+1,v)\;
+        low[v] = min(low[v], low[w])\;
+        \If{low[w] >= profundidad[w]}{
+            marcar (v,w) como puente\;
+        }
+    }{
+        low[v] = min(low[v], low[w])\;
+    }
+}
+\caption{dfsComponents}
+\end{algorithm}
+
 \newpage
 \subsection{Código de la solución}
 \lstinputlisting[numbers = left]{../src/c/c.cpp}
