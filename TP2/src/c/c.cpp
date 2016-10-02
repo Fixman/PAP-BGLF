@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <stack>
 
 using namespace std;
 
@@ -12,7 +11,7 @@ struct Edge {
 };
 
 typedef vector<int> vi;
-typedef stack<int> si;
+typedef vector<bool> vb;
 typedef vector<Edge> vEdge;
 
 #define forsn(i,s,n) for(int i=(int)s; i<(int)n; i++)
@@ -20,56 +19,39 @@ typedef vector<Edge> vEdge;
 #define pb push_back
 
 vector<vEdge> graph;
-vi low;
 vi depth;
-vi pred;
+vi low;
+vb visit;
 vector<bool> bridges; 
 vi CCSizes;
-vi CCNodes;
-
-bool DEBUG = false;
-
-// Desapila de 'nodes' y construye una nueva componente conexa. 
-// La componente incluye desde el tope de la pila, hasta 'v' SIN incluir. 
-// Tomamos -1 como un nodo ficticio que es predecesor de donde se empieza 
-// el DFS.
-void buildNewCC(int v, si &nodes){
-    int newCC = 0;
-    while(!nodes.empty() && pred[nodes.top()] != v){
-        CCNodes[nodes.top()] = CCSizes.size();
-        nodes.pop();
-        newCC++;
-    }
-    if(!nodes.empty() && pred[nodes.top()] == v){
-        CCNodes[nodes.top()] = CCSizes.size();
-        nodes.pop();
-        newCC++;
-    }
-    CCSizes.pb(newCC);
-}
 
 // Hace el DFS calculando los puentes. 
 // Ademas al encontrar un puente, genera la nueva componente conexa 
 // delimitada por el puente. 
-void dfs(int v, si &nodes){
-    nodes.push(v);
+void dfsBridges(int v, int d, int p){
+    depth[v] = low[v] = d;
     for(auto adj : graph[v]){
         int w = adj.node;
-        if(depth[w] == -1 && w != pred[v]){
-            depth[w] = low[w] = depth[v] + 1;
-            pred[w] = v;
-            dfs(w,nodes);
-            low[v] = min(low[v], low[w]);
-            if(low[w] >= depth[w]){
+        if(w != p){
+            if(depth[w] == -1){
+                dfsBridges(w,d+1,v);
+                low[v] = min(low[v], low[w]);
                 // Puente
-                bridges[adj.id] = true;
-                if(DEBUG) cerr << "Puente:\n\tArista " << adj.id+1 << "\n\t(" << v+1 << "," << w+1 << ")" << endl;
-                // Construimos la componente conexa sin el puente 
-                buildNewCC(v, nodes);
+                if(low[w] >= depth[w]) bridges[adj.id] = true;
+            }else{
+                low[v] = min(low[v], depth[w]);
             }
-        }else if(w != pred[v]){
-            low[v] = min(low[v], depth[w]);
         }
+    }
+}
+
+void dfsComponents(int v, vi &nodes){
+    visit[v] = true;
+    nodes.pb(v);
+    for(auto adj : graph[v]){
+        int w = adj.node;
+        int edge = adj.id;
+        if(!bridges[edge] && !visit[w]) dfsComponents(w, nodes);
     }
 }
 
@@ -85,21 +67,18 @@ int main(){
     // Preproceso
     depth = vi(N, -1);
     low = vi(N, -1);
-    pred = vi(N, -1);
-	bridges = vector<bool>(M, false);
-    CCSizes = vi(0);
-    CCNodes = vi(N, -1);
+	visit = vb(N, false);
+    bridges = vb(M, false);
+    CCSizes = vi(N, 0);
     
-    forn(i,N){ 
-		if(depth[i] == -1){ 
-			si nodes;
-            depth[i] = 0;
-            low[i] = 0;
-			dfs(i,nodes);
-            buildNewCC(-1, nodes);
-		}
-	}
-    if(DEBUG) forn(i,N) cerr << i << " " << CCNodes[i] << " " << CCSizes[CCNodes[i]] << endl;
+    // DFS para calcular los puentes
+    forn(i,N) if(depth[i] == -1) dfsBridges(i,0,i);
+    // DFS para calcular las componentes conexas sin puentes
+    forn(i,N) if(!visit[i]){
+        vi nodes;
+        dfsComponents(i,nodes);
+        for(auto v : nodes) CCSizes[v] = nodes.size();
+    }
     
     // Queries
     int QS; cin >> QS;
@@ -138,9 +117,9 @@ int main(){
             // 0 en el caso contrario. 
             int e; cin >> e; e--; cout << bridges[e] << endl;
         }else if(qi == 'C'){
-            // Devolvemos el tamanio de la componente conexta libre 
+            // Devolvemos el tamanio de la componente conexa libre 
             // de puentes que contiene a 'v' (menos 1, para no contar 'v').
-            int v; cin >> v; v--; cout << CCSizes[CCNodes[v]]-1 << endl;
+            int v; cin >> v; v--; cout << CCSizes[v]-1 << endl;
         }
     }
     return 0;
