@@ -184,6 +184,20 @@ es $\bigO(M + MQ_A + Q_B + Q_C)$.
 
 \subsection{Casos de prueba}
 
+\begin{flushleft}
+\begin{tabulary}{\textwidth}{@{}|L|L|L|@{}}
+\hline
+\textbf{Caso de prueba} & \textbf{Archivo de entrada} & \textbf{Salida esperada} \\
+\hline
+El grafo es un árbol, por tanto todas las aristas son puentes. 
+& \lstinputlisting{../src/ej3/arbol.in} & \lstinputlisting{../src/ej3/arbol.out} \\ \hline
+El grafo es un ciclo simple, por tanto no tiene ningún puente. 
+& \lstinputlisting{../src/ej3/sin_puentes.in} & \lstinputlisting{../src/ej3/sin_puentes.out} \\ \hline
+El grafo es una serie de ciclos simples conectados por aristas. Entre los ciclos simples no se 
+forman otros ciclos. Las aristas de los ciclos no son puentes, y las que conectan los ciclos sí. & \lstinputlisting{../src/ej3/ciclos.in} & \lstinputlisting{../src/ej3/ciclos.out} \\
+\hline
+\end{tabulary}
+\end{flushleft}
 
 \newpage
 \subsection{Código de la solución}
