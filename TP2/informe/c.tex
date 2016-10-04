@@ -166,6 +166,25 @@ agregar v a componente\;
 \caption{\texttt{dfsComponentes}}
 \end{algorithm}
 
+\subsubsection*{Análisis de complejidad}
+
+En base a lo visto en clase, la complejidad de \texttt{dfsPuentes} 
+(o el DFS modificado para calcular los puentes de un grafo), tiene 
+la misma complejidad que un DFS, que es $\bigO(N + M)$, que en nuestro contexto 
+es $\bigO(M)$. La complejidad de hacer los \texttt{dfsComponentes} es también $\bigO(N + M) = \bigO(M)$, 
+porque cada nodo se visita una vez, al igual que en un DFS clásico. Por tanto, 
+todo el precómputo tiene complejidad $\bigO(M)$. 
+
+Luego por lo que vimos antes, responder $Q_A$ queries de tipo A podemos 
+hacerlo en complejidad $\bigO(MQ_A)$, $Q_B$ queries de tipo B en $\bigO(Q_B)$, y $Q_C$ 
+queries de tipo C en $\bigO(Q_C)$. 
+
+Finalmente, la complejidad total de nuestro algoritmo 
+es $\bigO(M + MQ_A + Q_B + Q_C)$. 
+
+\subsection{Casos de prueba}
+
+
 \newpage
 \subsection{Código de la solución}
 \lstinputlisting[numbers = left]{../src/ej3/ej3.cpp}
