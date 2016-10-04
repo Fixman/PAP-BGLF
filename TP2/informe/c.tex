@@ -46,7 +46,7 @@ puentes, pero no de todos, sino de \textbf{los puentes que se encuentran
 en un camino simple desde $e_1$ hasta $e_2$}. 
 
 Si bien puede haber más de un camino simple entre $e_1$ y $e_2$, \textbf{no pueden 
-existir 2 caminos simples que usen distintos puentes}. Si existiesen 2, entonces 
+existir dos que usen distintos puentes}. Si existiesen dos, entonces 
 tendría que haber un ciclo conteniendo a esos puentes, lo cual es un absurdo. 
 De modo que los puentes en un camino simple de $e_1$ a $e_2$ son únicos, y es 
 claro que cumplen con la condición que buscamos porque necesariamente al remover 
@@ -97,17 +97,22 @@ la condición por lo visto antes.
 Tenemos entonces una equivalencia entre los nodos que queremos contar y su alcanzabilidad 
 en el grafo. Para responder las queries, podemos tener precomputadas las componentes conexas 
 del grafo sin puentes. Sabiendo para cada nodo a qué componente de estas pertenece y el tamaño 
-de las componentes, podemos responder cada query en $\bigO(1)$. Luego $Q_C$ queries 
-de tipo B tienen complejidad $\bigO(Q_C)$. \\
+de las componentes, podemos responder cada query en $\bigO(1)$. La respuesta será el tamaño 
+de dicha componente restado 1, porque debemos descontar al propio nodo por el cual estamos preguntando. 
+Luego $Q_C$ queries de tipo B tienen complejidad $\bigO(Q_C)$. \\
 
 \subsection{Algoritmo}
 Describimos a continuación el algoritmo completo en forma de pseudocódigo 
 que resuelve el problema en base a lo presentado en el análisis. 
 
 \begin{algorithm}[H]
-dfsBridges(0,0,0)\;
-\For{cada nodo no visitado}{
-dfsComponents(nodo)\;
+dfsPuentes(0,0,0)\;
+\For{cada nodo no visitado por dfsComponentes}{
+componente $\leftarrow$ \{\}\;
+dfsComponentes(nodo, componente)\;
+	\For{cada nodo de componente}{
+		tamaño[nodo] $\leftarrow$ componente\;
+	}
 }
 \For{cada query}{
 \If{tipo A}{
@@ -118,13 +123,13 @@ c $\leftarrow$ bfsCaminoSimple(u,v)\;
 \textbf{return} si la arista es puente o no\;
 }
 \If{tipo C}{
-\textbf{return} tamaño de la componente de v - 1\;
+\textbf{return} tamaño[nodo]-1\;
 }
 }
 \caption{Algoritmo general}
 \end{algorithm}
 
-El siguiente es el pseudocódigo de \texttt{dfsBridges}, que se encarga de calcular 
+El siguiente es el pseudocódigo de \texttt{dfsPuentes}, algoritmo que se encarga de calcular 
 los puentes del grafo. 
 
 \begin{algorithm}[H]
@@ -132,7 +137,7 @@ los puentes del grafo.
 profundidad[v] = low[v] = d\;
 \For{cada vecino w de v distinto del padre}{
     \eIf{profundidad[w] == -1}{
-        dfsBridges(w,d+1,v)\;
+        dfsPuentes(w,d+1,v)\;
         low[v] = min(low[v], low[w])\;
         \If{low[w] >= profundidad[w]}{
             marcar (v,w) como puente\;
@@ -141,29 +146,26 @@ profundidad[v] = low[v] = d\;
         low[v] = min(low[v], low[w])\;
     }
 }
-\caption{dfsBridges}
+\caption{\texttt{dfsPuentes}}
 \end{algorithm}
 
-Y por último el pseudocódigo para calcular las componentes conexas del grafo 
-sin puentes. 
+Por último mostramos el pseudocódigo de \texttt{dfsComponentes}, para calcular 
+las componentes conexas del grafo sin puentes. El algoritmo es una variación 
+de un DFS, con la única diferencia de evitamos visitar un nodo si llegamos a el 
+por un arista puente. 
 
 \begin{algorithm}[H]
-\KwData{v, d, padre}
-profundidad[v] = low[v] = d\;
-\For{cada vecino w de v distinto del padre}{
-    \eIf{profundidad[w] == -1}{
-        dfsBridges(w,d+1,v)\;
-        low[v] = min(low[v], low[w])\;
-        \If{low[w] >= profundidad[w]}{
-            marcar (v,w) como puente\;
-        }
-    }{
-        low[v] = min(low[v], low[w])\;
-    }
+\KwData{v, componente}
+visitar v\;
+agregar v a componente\;
+\For{cada vecino w de v no visitado}{
+	\If{la arista (v,w) no es puente}{
+		dfsComponentes(w, componente)\;
+	}
 }
-\caption{dfsComponents}
+\caption{\texttt{dfsComponentes}}
 \end{algorithm}
 
 \newpage
 \subsection{Código de la solución}
-\lstinputlisting[numbers = left]{../src/c/c.cpp}
+\lstinputlisting[numbers = left]{../src/ej3/ej3.cpp}

@@ -22,7 +22,7 @@ vector<vEdge> graph;
 vi depth;
 vi low;
 vb visit;
-vector<bool> bridges; 
+vb bridges; 
 vi CCSizes;
 
 // Hace el DFS calculando los puentes. 
@@ -45,6 +45,8 @@ void dfsBridges(int v, int d, int p){
     }
 }
 
+// Hace DFS ignorando pasar por aristas que sean puentes, y va llevando 
+// la cuente de la componente. 
 void dfsComponents(int v, vi &nodes){
     visit[v] = true;
     nodes.pb(v);
@@ -95,6 +97,7 @@ int main(){
             predEdge[u] = -1;
             while(!Q.empty()){
                 int x = Q.front(); Q.pop();
+				// Al llegar a 'v' cortamos el BFS. 
                 if(x == v) break;
                 for(auto adj : graph[x]){
                     int y = adj.node;
