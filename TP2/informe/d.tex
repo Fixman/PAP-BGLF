@@ -2,8 +2,42 @@
 \section{Problema D: Desocupando del pabellón}
 \textbf{Peso del ejercicio: X}
 \subsection{Descripción del problema}
+
+El problema puede modelarse de la siguiente forma si consideramos como vértices a las aulas y como aristas dirigidas a los pasillos. Dado un grafo dirigido de $\textbf{A}$ vértices y $\textbf{P}$ aristas, responder $\textbf{Q}$ preguntas de la forma: "¿Existe un camino de $v_1$ a $v_2$ y otro de $v_2$ a $v_1$?"
 \subsection{Soluciones al problema}
-\subsection{Algoritmo}
+
+En lo que sigue llamaremos $\mathcal{A}$ (aulas) al conjunto de vértices y $\mathcal{P}$ (pasillos) al conjunto de aristas. Por enunciado tenemos que $\# \mathcal{A} = \textbf{A}$ y que $\# \mathcal{P} = \textbf{P}$
+
+\subsubsection{Enfoque naïve}
+
+Una vez obtenida la representación del grafo con listas de adyacencia, podríamos responder a cada query lanzando un algoritmo de recorrido de grafo ("BFS" o "DFS" por ejemplo) desde $v_1$ chequeando si alcanza a $v_2$, y otro desde $v_2$ chequeando si se alcanza a $v_1$. 
+
+De esa forma tendríamos una complejidad de  $\mathcal{O} \left (\textbf{A} + \textbf{P} \right ) $ para leer la entrada y luego  $\mathcal{O} \left (\textbf{A} + \textbf{P} \right )$ para responder cada query. Obteniendo en total un algoritmo de complejidad $\mathcal{O} \left (\textbf{A} + \textbf{P} + \textbf{Q} \cdot \left ( \textbf{A} + \textbf{P} \right ) \right )$, que claramente no satisface la complejidad pedida por el enunciado.
+
+\subsubsection{Enfoque con componentes fuertemente conexas}
+
+Notemos primero que nada que no se realiza ningún cambio en el grafo entre las queries, eso nos da la pauta de que si realizamos un precómputo en $\mathcal{O}(\textbf{A} + \textbf{P})$ que nos permita resolver cada query en $\mathcal{O}(1)$, entonces tendríamos un algoritmo con complejidad $\mathcal{O}(\textbf{A} + \textbf{P} + \textbf{Q})$ como pide el enunciado.
+
+Estudiemos lo que se nos pide en las queries, para entender entonces qué precomputar (aunque el título de la sección ya es un spoiler). Dados dos vértices $v_1$ y $v_2$, queremos saber si existe un camino de $v_1$ a $v_2$ y viceversa, pero por lo visto en clase esto ocurre si y solo si $v_1$ y $v_2$ están en una misma componente fuertemente conexa del grafo.
+
+Por ende, si calculamos en $\mathcal{O}(\textbf{A} + \textbf{P})$ a qué componente fuertemente conexa pertence cada nodo, y nos guardamos ese resultado en un arreglo llamado $\texttt{scc}$ de tamaño $\textbf{A}$, responder una query se reduce a responder si ocurre que $\texttt{scc}[v_2] = \texttt{scc}[v_2]$, lo cual se realiza en $\mathcal{O}(1)$ y cumple con lo estudiado en el primer párrafo.
+
+\subsection{Algoritmo y Análisis de Complejidad}
+
+\begin{enumerate}
+	\item Leemos $\textbf{A}$ y $\textbf{P}$. Complejidad $\mathcal{O}(1)$
+	\item Leemos las $\textbf{P}$ aristas y las guardamos como lista de adyacencia del grafo original, y también del grafo transpuesto. Creamos \texttt{orden} como una cola de dos puntas (solo para evidenciar que podemos apilar al frente de la cola) vacía. Complejidad $\mathcal{O}(2\cdot \textbf{P}) + \mathcal{O}(1) = \mathcal{O}(\textbf{P})$
+	\item Corremos DFS, y al finalizar la visita a un nodo, empujamos dicho nodo al frente de $\texttt{orden}$. Como este último paso agrega una operación $\mathcal{O}(1)$ por cada vértice, en total tenemos la misma complejidad de DFS. $\mathcal{O}(\textbf{A} + \textbf{P})$ 
+	\item Corremos DFS, pero en el orden dado por $\texttt{orden}$ y en el grafo transpuesto. Además en el ciclo central del DFS vamos actualizando un contador que aumentamos cada vez que lanzamos una búsqueda nueva, y cada vez que terminamos la visita de un nodo, guardamos en $\texttt{scc}$ a qué componente pertence el nodo. Nuevamente la complejidad de esto es $\mathcal{O}(\textbf{A} + \textbf{P})$, pue solo agregamos un contador y la actualización de un lugar en el arreglo, que se hacen a lo sumo una vez por nodo.
+	\item Leemos $\textbf{Q}$. Complejidad $\mathcal{O}(1)$
+	\item Leemos las $\textbf{Q}$ queries y en cada query, leemos a $v_1$ y $v_2$. Si $\texttt{scc}[v_1] = \texttt{scc}[v_2]$ imprimimos "S", si no, imprimimos "N". Complejidad $\mathcal{O}(\textbf{Q})$, pues se responde en $\mathcal{O}(1)$ cada query.
+\end{enumerate}
+
+\begin{itemize}
+	\item \textbf{Observación} : Notar que los puntos 3 y 4 corresponden al Algoritmo de Kosaraju visto en clase.
+\end{itemize}
+
+Nos queda una complejidad de $\mathcal{O}(\underset{1 \text{ y } 2}{\underbrace{\textbf{P}}} + \underset{3}{\underbrace{(\textbf{A} + \textbf{P})}} + \underset{4}{\underbrace{(\textbf{A} + \textbf{P})}} + \underset{5 \text{ y } 6}{\underbrace{\textbf{Q})}}$. Lo cual nos da como complejidad final $\mathcal{O}(\textbf{A} + \textbf{P} + \textbf{Q})$, que cumple con la complejidad pedida en el trabajo práctico.	 
 \newpage
 \subsection{Código de la solución}
-%\lstinputlisting[numbers = left]{../src/d/d.cpp}
+\lstinputlisting[numbers = left]{../src/ej4/ej4.cpp}
