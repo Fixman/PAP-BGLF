@@ -38,6 +38,8 @@ struct FlowNetwork
 		// arista dirigida con peso 1 por cada uno de los N nodos originales
 		// el flujo máximo F está acotado por N, y esto también acota la
 		// cantidad de caminos en N. Por lo tanto, hay O(N) caminos.
+		// Cada iteración tarda O(M + N) = O(M), por lo que esta parte
+		// del algoritmo tiene una complejidad temporal de O(MN).
 		int maxFlow = 0;
 		while (true)
 		{
@@ -71,6 +73,8 @@ struct FlowNetwork
 
 			// Recorrer el camino de augmento que creamos y buscar la mínima capacidad
 			// disponible. Esta va a ser la capacidad del camino.
+			// Como un camino no puede pasar dos veces por el mismo nodo, esto tarda
+			// O(N) iteraciones.
 			int df = 1 - flow[T][*pred[T]];
 			for (Node e = *pred[T]; pred[e]; e = *pred[e])
 				df = min(df, 1 - flow[e][*pred[e]]);
@@ -149,6 +153,9 @@ int main()
 		FlowNetwork fn(n);
 		for (int i = 0; i < n; i++)
 		{
+			// Si un nodo es una escuela, agregar una arista de su nodo
+			// correspondiente al sumidero. Si es un alumno, conectarla
+			// a la fuente.
 			char c; cin >> c;
 			if (c == 'E')
 				fn.addEdge(i, fn.T);
