@@ -1,9 +1,64 @@
+\newcommand{\mleft}{\text{left}}
+\newcommand{\mright}{\text{right}}
+% \newcommand{\bigO}{\mathbb{O}}
 \newpage{}
-\section{Problema A: Alumnos de secundario}
+
+\section{Problema A:\@ Alumnos de secundario}
 \textbf{Peso del ejercicio: X}
+
 \subsection{Descripción del problema}
+
+El problema consiste en una ciudad con \(N\) esquinas y \(M\) calles bidirecciones que las conectan. Con esta primera frase en la descripción del problema, ya se puede asumir el problema se trata de un problema dentro de la \textbf{Teoría de Grafos}. De esta manera, representamos a la red con un grafo \(G = \left<V, E\right>\) con \(N\) nodos y \(M\) aristas, que va a ser conexo y donde todos los nodos van a estar en alguno de los tres conjuntos disjuntos \(A\), \(E\), y \(X\).
+
+Con esta abstracción de los datos, lo que queremos encontrar es el tamaño del menor conjunto de nodos \(D\) tal que por cada camino entre escuelas \(x_1, \ldots, x_n\) donde \(x_1 \in A\), \(x_n \in E\), \(x_i \in V \; \forall i \in \left[1, n\right]\), y \(\left<x_i, x_{i + 1}\right> \in E \; \forall i \left[1, n - 1\right]\), exista in \(i\) tal que \(x_i \in D\).
+
 \subsection{Soluciones al problema}
+
+La descripción de este problema se presta facilmente al problema de buscar al tamaño del mínimo corte, que es igual al del flujo máximo\cite[\textit{theorem~26.6}]{cormen}. Sin embargo, la versión intuitiva del problema --- que conecta todas las esquinas con alumnos \(x \in A\) con un nodo fuente \(S\), y todas las esquinas con escuelas \(x \in E\) con un nodo sumidero \(T\), se le asigna 1 de capacidad de todas las aristas, y se calcula el flujo máximo de \(S\) a \(T\) --- no funciona, porque estamos intentando poner alumnos de ciencias de la computación en esquinas (nodos), y este problema busca el corte mínimo por aristas.
+
+Para resolver este problema, lo que sí se puede hacer es separar a las esquinas entre dos nodos, llamados \textit{left} y \textit{right} que tengan una arista dirigida entre ellos, y que todas las aristas entrantes a un nodo pasen por \textit{left}, y las salientes salgan por \textit{right}. De esta manera, se genera el grafo \(G'\) de la siguiente forma.
+
+\begin{align}
+G' = &\left<V', E'\right> \\
+V' = &\left\{ x_\mleft \mid x \in V \right\} \cup \left\{ x_\mright \mid x \in V \right\} \cup \left\{ S, T \right\} \\
+E' = &\left(
+\begin{aligned}
+&\;\;\;\, \left\{ \left< x_\mright, y_\mleft \right> \mid \left< x, y \right> \in E \right\} \\
+& \cup \left\{ \left< x_\mleft, x_\mright \right> \mid x \in V \right\} \\
+& \cup \left\{ \left< S, x_\mleft \right> \mid x \in A \right\} \cup \left\{ \left< x_\mright, T \right> \mid x \in E \right\}
+\end{aligned}
+\right)
+\end{align}
+
+Se definen las capacidades de todas las aristas de la forma \(\left< x_\mleft, x_\mright \right>\) como 1. Esto significa que, como las únicas aristas entrantes a los nodos \textit{right} en \(G'\) tienen capacidad 1, todas las aristas salientes que no salen de \(S\) salen de un nodo \textit{right}, y no hay una arista entre \(S\) y \(T\), cualquier arista que no salga de \(S\) va a tener flujo máximo 1, y la cantidad de flujo que pase por las que sí nunca se va a pasar este valor. Por esta razón, aunque según la definición del problema todas las aristas que no sean de esa forma deberían tener capacidad \(\infty\), por simplicidad les asignamos capacidad \(1\) con los mismos resultados.
+
 \subsection{Algoritmo}
-\newpage
+
+Para resolver el problema de corte mínimo/flujo máximo en \(G'\), usamos el algoritmo de \textbf{Edmonds-Karp}\cite{cormen}, que usa breadth-first search para encontrar el camino de augmento. Este algoritmo nos garantiza una complejidad de \(\bigO(|V| \cdot {|E|}^2)\)\cite[\textit{theorem~26.8}]{cormen}, que en nuestro caso sería igual a la ecuación~\ref{ekcomp}.
+
+\begin{equation}
+\bigO\left(\left|V'\right| \cdot {\left|E'\right|}^2\right) = \bigO\left(\left(2 + 2 \cdot N\right) \cdot {\left(N + M + \left|A\right| + \left|E\right|\right)}^2\right) = \bigO(N \cdot M^2)
+\label{ekcomp}
+\end{equation}
+
+Por otro lado, Edmonds-Karp está acotado por la complejidad del algoritmo de Ford-Fulkenson \(\bigO(f \cdot |E|)\), donde \(f\) es la cantidad de flujo máximo que pasa por la red\cite[\textit{theorem~26.8}]{cormen}. Como la capacidad de todas las aristas es 1, el flujo máximo está acotado por \(N\), y la complejidad final pasa a ser \(\bigO(N \cdot M)\).
+
 \subsection{Código de la solución}
-%\lstinputlisting[numbers = left]{../src/a/a.cpp}
+\lstinputlisting[numbers = left]{../src/ej1/ej1.cpp}
+
+\newpage{}
+\subsection{Casos de prueba}
+
+\begin{tabulary}{\textwidth}{@{}|L|l|L|@{}}
+\hline
+\textbf{Caso de prueba} & \textbf{Archivo de entrada} & \textbf{Salida esperada} \\
+\hline
+Hay solo un alumno y una escuela & \lstinputlisting[basicstyle=\scriptsize]{../src/ej1/ej1Chico.in} & \lstinputlisting[basicstyle=\scriptsize]{../src/ej1/ej1Chico.out} \\ \hline
+Hay un solo alumno y una sola escuela con muchos posibles caminos & \lstinputlisting[basicstyle=\scriptsize]{../src/ej1/ej1Poco.in} & \lstinputlisting[basicstyle=\scriptsize]{../src/ej1/ej1Poco.out} \\ \hline
+Hay muchos caminos posibles, pero una solución greedy suele no lograr un corte óptimo & \lstinputlisting[basicstyle=\scriptsize]{../src/ej1/ej1NotGreedy.in} & \lstinputlisting[basicstyle=\scriptsize]{../src/ej1/ej1NotGreedy.out} \\ \hline
+Hay una cantidad muy grande de nodos\footnotemark{} & \texttt{ej1NoTanGrande.in} & \scriptsize{El programa termina en menos de 1 segundo y con un resultado razonable.} \\ \hline
+Hay una cantidad muy grande de nodos y de aristas en un grafo fuertemente conexo & \texttt{ej1Grande.in} & \scriptsize{El programa termina en menos de 1 segundo\footnotemark{} y con un resultado razonable.} \\ \hline
+\end{tabulary}
+
+\footnotetext[3]{No probamos que este grafo es conexa, pero el programa da la solución correcta igualmente.}
+\footnotetext[4]{De hecho, termina en 0.4 segundos, lo que es más rápido que lo que indica la complejidad. Esto es resultado de que los algoritmos de flujo suelen ser rápidos en casos no patológicos.}

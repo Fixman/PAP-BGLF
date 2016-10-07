@@ -17,13 +17,13 @@ typedef vector <vector <Node>> Graph;
 // Para todas las aristas entrantes a cualquier nodo n del grafo original hay
 // una arista entrante a left(n); para todas las aristas salientes hay una
 // arista saliente de right(n).
-// También se pueden agregar aristas de la fuente y al sumidero.
+// Tambien se pueden agregar aristas de la fuente y al sumidero.
 struct FlowNetwork
 {
 	Graph G;
 	const Node S, T;
 
-	// Dar el corte mínimo del grafo usando el algoritmo de Edmonds-Karp.
+	// Dar el corte minimo del grafo usando el algoritmo de Edmonds-Karp.
 	int MinCut()
 	{
 		// Flujo que hay entre cada par de nodos <x, y>.
@@ -32,13 +32,13 @@ struct FlowNetwork
 		// flow[x][y] == 1 sii flow[y][x] == -1.
 		vector <vector <int>> flow(G.size(), vector <int> (G.size(), 0));
 
-		// Buscar caminos de augmento que mejoren el flujo máximo usando BFS.
-		// La cantidad de caminos de augmento está acotada en N * M en el
+		// Buscar caminos de augmento que mejoren el flujo maximo usando BFS.
+		// La cantidad de caminos de augmento esta acotada en N * M en el
 		// caso general (Cormen, teorema 26.8). De hecho, como hay una nueva
 		// arista dirigida con peso 1 por cada uno de los N nodos originales
-		// el flujo máximo F está acotado por N, y esto también acota la
+		// el flujo maximo F esta acotado por N, y esto tambien acota la
 		// cantidad de caminos en N. Por lo tanto, hay O(N) caminos.
-		// Cada iteración tarda O(M + N) = O(M), por lo que esta parte
+		// Cada iteracion tarda O(M + N) = O(M), por lo que esta parte
 		// del algoritmo tiene una complejidad temporal de O(MN).
 		int maxFlow = 0;
 		while (true)
@@ -66,12 +66,12 @@ struct FlowNetwork
 				}
 			}
 
-			// Si no se encontró ningún camino de augmento hasta el sumidero,
-			// el algoritmo ya tiene el corte óptimo.
+			// Si no se encontro ningun camino de augmento hasta el sumidero,
+			// el algoritmo ya tiene el corte optimo.
 			if (!pred[T])
 				break;
 
-			// Recorrer el camino de augmento que creamos y buscar la mínima capacidad
+			// Recorrer el camino de augmento que creamos y buscar la minima capacidad
 			// disponible. Esta va a ser la capacidad del camino.
 			// Como un camino no puede pasar dos veces por el mismo nodo, esto tarda
 			// O(N) iteraciones.
@@ -90,17 +90,6 @@ struct FlowNetwork
 		}
 
 		return maxFlow;
-	}
-
-	string print(Node n)
-	{
-		if (n == S)
-			return "S";
-
-		if (n == T)
-			return "T";
-
-		return to_string(n / 2 + 1) + " " + (n % 2 == 0 ? "left" : "right");
 	}
 
 	// Un nodo "left" es un nodo que tiene muchas aristas entrantes y una sola
