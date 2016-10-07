@@ -51,12 +51,33 @@
 	Luego $r=s$.
 	
 \subsection{Algoritmo}
-	Por lo visto en la clase de flujo para encontrar la cantidad mínima 
-	de caminos para cubrir un DAG de $n$ vertices
-	$v_1,\dots ,v_n$, me construyo un grafo bipartito duplicando los vertices
-	$u_1,\dots ,u_n$ y conecto $v_i$ con $u_j$ si $v_i$ estaba conectado con 
-	$v_j$ en el DAG y calculo matching maximo de flujo resultante $m$ sobre este grafo. Luego
-	la minima cantidad de caminos para cubrir el DAG es $n-m$.
+	%~ Por lo visto en la clase de flujo para encontrar la cantidad mínima 
+	%~ de caminos para cubrir un DAG de $n$ vertices
+	%~ $v_1,\dots ,v_n$, me construyo un grafo bipartito duplicando los vertices
+	%~ $u_1,\dots ,u_n$ y conecto $v_i$ con $u_j$ si $v_i$ estaba conectado con 
+	%~ $v_j$ en el DAG y calculo matching maximo de flujo resultante $m$ sobre este grafo. Luego
+	%~ la minima cantidad de caminos para cubrir el DAG es $n-m$.
+	
+		
+	%~ Por lo visto en la clase de flujo para encontrar la cantidad mínima 
+	%~ de caminos para cubrir un DAG de $n$ vertices
+	%~ $v_1,\dots ,v_n$ lo represento como un grafo bipartito duplicando
+	%~ los vertices originales. Ahora tengo dos conjuntos de vertices
+	%~ $\{ v_1,\dots ,v_n\} $ y $\{ u_1,\dots ,u_n\} $. Conecto $v_i$ 
+	%~ con $u_j$ si $v_i$ esta conectado con $v_j$ en el DAG. Si $m$ es el
+	%~ matching maximo de este grafo bipartito, que encontramos usando
+	%~ el algoritmo de Edmonds Karp como vimos en clase, entonces
+	%~ la minima cantidad de caminos para cubrir el DAG es $n-m$.
+	
+	
+	Dadas $n$ acciones $ v_1,\dots ,v_n$ me construyo el grafo bipartito
+	duplicando los vertices originales. Ahora tengo dos conjuntos
+	de vertices $\{ v_1,\dots ,v_n\} $ y $\{ u_1,\dots ,u_n\} $ y
+	$(i,j)$ es una arista del grafo si $P_{i,t}<P_{j,t}$ para todo $1\leq t\leq D$.
+	Si $m$ es el matching maximo de este grafo bipartito, que encontramos
+	usando el algoritmo de Edmonds Karp, entonces por los visto en la
+	clase de flujo la minima cantidad de caminos para cubrir $G$, el DAG 
+	de las acciones, es $n-m$.
 	
 	
 	Detectar cuales vertices se conectan cuesta $\mathcal{O}(A^2D)$ y como el grafo
