@@ -2,8 +2,68 @@
 \section{Problema B: Buenos gráficos}
 \textbf{Peso del ejercicio: X}
 \subsection{Descripción del problema}
-\subsection{Soluciones al problema}
+	Dados los precios de $A$ acciones durante $D$ dias, se nos 
+	pregunta la mínima cantidad de gráficos para graficar los 
+	precios de estas acciones en el tiempo de tal manera que 
+	los precios no se intersecten. Si los precios de dos acciones
+	no se intersectan pueden dibujarse en un mismo gráfico.
+	
+	
+\subsection{Solución al problema}
+	Nos construimos un grafo donde los vertices representan 
+	las acciones y el vertice $i$ esta conectada con el vertice $j$ si
+	los precios de la acci\'on $j$ son estrictamente mayores que los precios de la 
+	acci\'on $i$. Simbolicamente $G=(V,E)$ donde $V=\{a_1,\dots ,a_A\}$ y si
+	$P_{i,t}$ denota al precio de la accio\'n i-esima a tiempo $t$ entonces
+	$(i,j) \in E$ si y solo si $P_{i,t}<P_{j,t}$ para todo $1\leq t\leq D$.
+	
+	
+	
+	El grafo es dirigido claramente, es transitivo pues si $(i,j)$,$(j,k)$ $\in$ $E$
+	entonces $P_{i,t}<P_{j,t}$ y $P_{j,t}<P_{k,t}$ para todo $1\leq t\leq D$ entonces
+	$P_{i,t}<P_{k,t}$ para todo $1\leq t\leq D$ entonces $(i,k)$ $\in$ $E$. También
+	es aciclico pues si $i$ y $j$ estan en un ciclo por transitividad
+	vale que $(i,j)$,$(j,i)$ $\in$ $E$ entonces  $P_{i,t}<P_{j,t}$ y $P_{j,t}<P_{i,t}$, absurdo.
+	Luego G es un DAG.
+	
+	
+	Si llamamos $r$ a la cantidad mínima de caminos para cubrir el DAG
+	y $s$ a la cantidad mínima de gráficos para repartir las acciones
+	sin que haya solapamiento, quiero ver que $r=s$.
+	
+	%por que el menor cubrimiento por cadenas es lo que quiero??
+	Notamos $g_1,\dots ,g_s$ a los gráficos, a cada gráfico $g_k$ le corresponde
+	un conjunto de acciones $a_{j_1},\dots ,a_{j_{N_k}}$ que no se solapan
+	por lo que puedo suponer que estan ordenadas de menor a mayor, con respecto
+	a los precios, entonces
+	$c_k=((j_1,j_2),\dots ,(j_{N_k-1},j_{N_k}))$ es un camino en G. De esta manera me construyo
+	$c_1,\dots ,c_s$ caminos y cubren G pues toda acción esta algún 
+	gráfico entonces toda acción esta en algun camino.
+	Luego $r\leq s$.
+	
+	Sea $c_1,\dots ,c_r$ el menor cubrimiento por caminos del
+	grafo. Si $a_{j_1},\dots ,a_{j_{N_k}}$ son los elementos de
+	camino $c_k$ ordenados de menor a mayor entonces $P_{i,t}<P_{i+1,t}$
+	para todo $1\leq t\leq D$ y para todo $1\leq i\leq N_k-1$, 
+	luego me construyo el grafico $g_k$ con estas acciones, no se
+	solapan pues la diferencia entre los precios es positiva.
+	Luego $s\leq r$.
+	Luego $r=s$.
+	
 \subsection{Algoritmo}
+	Por lo visto en la clase de flujo para encontrar la cantidad mínima 
+	de caminos para cubrir un DAG de $n$ vertices
+	$v_1,\dots ,v_n$, me construyo un grafo bipartito duplicando los vertices
+	$u_1,\dots ,u_n$ y conecto $v_i$ con $u_j$ si $v_i$ estaba conectado con 
+	$v_j$ en el DAG y calculo matching maximo de flujo resultante $m$ sobre este grafo. Luego
+	la minima cantidad de caminos para cubrir el DAG es $n-m$.
+	
+	
+	Detectar cuales vertices se conectan cuesta $\mathcal{O}(A^2D)$ y como el grafo
+	bipartito tiene $2A$ nodos y $A^2$ aristas la complejidad de 
+	calcular matching maximo es $\mathcal{O}(A^3)$.
+	En total el algoritmo tiene una complejidad de $\mathcal{O}(A^2(A+D))$ como
+	se pedia en el enunciado.
 \newpage
 \subsection{Código de la solución}
-%\lstinputlisting[numbers = left]{../src/b/b.cpp}
+\lstinputlisting[numbers = left]{../src/b/b.cpp}
