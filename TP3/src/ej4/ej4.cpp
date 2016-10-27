@@ -1,13 +1,27 @@
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <vector>
 
 #define clz __builtin_clz
 
+constexpr int nearest_power(int n)
+{
+	return (1 << 8 * sizeof(int) - clz(n)) - n;
+}
+
 class Pair
 {
 	const int a, b;
-	friend Pair operator+(const Pair &, const Pair &);
+	friend Pair operator+(const Pair &f, const Pair &s)
+	{
+		if (f.a > s.a)
+			return Pair(f.a, std::max(f.b, s.a));
+
+		return Pair(s.a, std::max(s.b, f.a));
+	}
+
+	friend int main();
 
 	public:
 	int sum() const
@@ -15,8 +29,13 @@ class Pair
 		return a + b;
 	}
 
+	explicit Pair()
+	: Pair(0)
+	{
+	}
+
 	explicit Pair(int n)
-	: a(n), b(b)
+	: Pair(n, 0)
 	{
 	}
 
@@ -26,32 +45,48 @@ class Pair
 	}
 };
 
-Pair operator+(const Pair &f, const Pair &s)
-{
-	if (f.a > s.a)
-		return Pair(f.a, std::max(f.b, s.a));
-	
-	return Pair(s.a, std::max(s.b, f.a));
-}
-
 template <typename T>
 class SegmentTree
 {
 	const std::vector <T> tree;
 
-	std::vector<T> built_tree(const std::vector<T> &values)
+	static std::vector<T> build_tree(const std::vector<T> &values)
 	{
-		std::vector <T> tree(values.rbegin(), values.rend());
+		assert(!values.empty());
 
-		for (int k = 0; k < tree.size(); k += 2)
+		std::vector <T> tree(nearest_power(values.size()));
+		std::copy(values.rbegin(), values.rend(), std::back_inserter(tree));
+
+		for (int k = 0; k < tree.size() - 1; k += 2)
 			tree.push_back(tree[k] + tree[k + 1]);
 
-		return std::vector <T> (tree.rbegin(), tree.rend());
+		tree.push_back(T());
+		return std::vector <T>(tree.rbegin(), tree.rend());
+	}
+
+	T accum_node(int n, int f, int t)
+	{
+		int h = clz(n) - clz(tree.size());
+		int l = (n - (1 << clz(n))) * h;
+		int r = (n - (1 << clz(n)) + 1) * h;
+
+		if (f >= r || t <= l)
+			return T();
+
+		if (f <= l && t >= r)
+			return tree[n];
+
+		return accum_node(2 * n, f, t) + accum_node(2 * n + 1, f, t);
 	}
 
 	public:
+	T accum(int f, int t)
+	{
+		return accum_node(1, f, t);
+	}
+
 	SegmentTree(const std::vector <T>& values)
-	: tree(built_tree(values))
+	: tree(build_tree(values))
 	{
 	}
 
@@ -60,10 +95,21 @@ class SegmentTree
 
 int main()
 {
-	std::vector <Pair> f{Pair(0), Pair(1), Pair(2), Pair(3), Pair(4), Pair(5)};
-	SegmentTree<Pair> s(f);
+	int d, r;
+	while (std::cin >> d >> r)
+	{
+		std::vector <int> E(d);
+		for (auto &k : E)
+			std::cin >> k;
 
-	std::for_each(s.tree.begin(), s.tree.end(), [] (Pair a) { std::cout << a.sum() << std::endl; });
+		SegmentTree<Pair> st(std::vector<Pair>(E.begin(), E.end()));
+		for (int i = 0; i < r; i++)
+		{
+			int p, u;
+			std::cin >> p >> u;
+			std::cout << st.accum(p, u).sum() << std::endl;
+		}
+	}
 
 	return 0;
 }
