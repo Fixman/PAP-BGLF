@@ -7,6 +7,7 @@
 
 constexpr int nearest_power(int n)
 {
+	assert(n > 0);
 	return 1 << 8 * sizeof(int) - clz(n) - 1;
 }
 
@@ -40,6 +41,7 @@ class Pair
 	Pair(int a, int b)
 	: a(a), b(b)
 	{
+		assert (a >= b);
 	}
 };
 
@@ -64,6 +66,8 @@ class SegmentTree
 
 	T accum_node(int n, int f, int t)
 	{
+		assert(!tree.empty());
+
 		int h = 1 << clz(n) - clz(tree.size()) - 1;
 		int l = (n - nearest_power(n)) * h;
 		int r = (n - nearest_power(n) + 1) * h;
