@@ -7,7 +7,7 @@
 
 constexpr int nearest_power(int n)
 {
-	return (1 << 8 * sizeof(int) - clz(n)) - n;
+	return 1 << 8 * sizeof(int) - clz(n) - 1;
 }
 
 class Pair
@@ -20,8 +20,6 @@ class Pair
 
 		return Pair(s.a, std::max(s.b, f.a));
 	}
-
-	friend int main();
 
 	public:
 	int sum() const
@@ -54,7 +52,7 @@ class SegmentTree
 	{
 		assert(!values.empty());
 
-		std::vector <T> tree(nearest_power(values.size()));
+		std::vector <T> tree(values.size() - nearest_power(values.size()));
 		std::copy(values.rbegin(), values.rend(), std::back_inserter(tree));
 
 		for (int k = 0; k < tree.size() - 1; k += 2)
@@ -66,9 +64,9 @@ class SegmentTree
 
 	T accum_node(int n, int f, int t)
 	{
-		int h = clz(n) - clz(tree.size());
-		int l = (n - (1 << clz(n))) * h;
-		int r = (n - (1 << clz(n)) + 1) * h;
+		int h = 1 << clz(n) - clz(tree.size()) - 1;
+		int l = (n - nearest_power(n)) * h;
+		int r = (n - nearest_power(n) + 1) * h;
 
 		if (f >= r || t <= l)
 			return T();
@@ -89,8 +87,6 @@ class SegmentTree
 	: tree(build_tree(values))
 	{
 	}
-
-	friend int main();
 };
 
 int main()
