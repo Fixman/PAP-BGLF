@@ -1,0 +1,230 @@
+\newpage{}
+\section{Problema A: Ayudando a los gorilas}
+\textbf{Peso del ejercicio: 10}
+\subsection{Descripción del problema}
+	El problema consta de dado un string T de largo $n$ y un string P de 
+	largo $m\leq n$, decidir si P es substring de T.
+	
+\subsection{Solución al problema}
+	Ya que se nos pide que la soluci\'on tenga una complejidad temporal
+	lineal en la longitud del string T,ie. $O(n)$, vamos a implementar el algoritmo
+	de Knuth, Morris y Pratt, KMP. Pero antes veamos el algoritmo naive
+	ya que alli aparece naturalmente la problematica que soluciona KMP.
+	
+\subsection{Algoritmo Naive}
+	El algoritmo naive para ver si P es substring de T es recorrer
+	T lugar a lugar y en cada posici\'on comparar si P matchea o no. M\'as
+	formalmente verificamos si existe $0\leq s \leq n-m$ tal que 
+	$P[i]=T[s+i]$ para todo $1\leq i \leq m$.
+	
+	\incmargin{1em}
+	\restylealgo{boxed}\linesnumbered
+	\begin{algorithm}
+		\SetKwInOut{Input}{input}
+		\SetKwInOut{Output}{output}
+		\caption{matchingNaive}
+		\Input{String T y un string P}
+		\Output{Valor booleano}
+		\BlankLine
+	
+		$n\leftarrow$longitud T\;
+		$m\leftarrow$longitud P\\
+		\For{$i\leftarrow 1$ hasta $n-m+1$}{
+			\For{$j\leftarrow1$ hasta $m$}{
+				\If{T[i+j] es distinto de P[j]}{
+					Salir de bucle interno\;
+				}
+				\If{Llege al ultimo caracter de P}{
+					return True\;
+				}
+			}
+		}
+		return False\;
+	\end{algorithm}
+	\decmargin{1em}
+	
+	
+	Si $m=n/2$ entonces el algoritmo hace $\frac{n^2}{4}$ iteraciones
+	en el bucle, por lo cual tiene una compejidad $O(n^2)$. Observemos
+	que la funcion que nos da el siguiente caracter desde el cual
+	comparar nuestro patron es simplemente trasladar un caracter hacia
+	la derecha lo cual desaprovecha cualquier comparaci\'on que hayamos
+	hecho. El algoritmo de KMP arregla esto preprocesando 
+	la estructura del patron para dar una funci\'on de salto mas eficiente.
+
+
+\subsection{Algoritmo de Knuth, Morris y Pratt}
+	El algoritmo de KMP aprovecha las comparaciones ya hechas del patron
+	P contra el texto T habiendo prepocesado una tabla de bordes del 
+	patron. 
+	
+	
+	Concretamente definimos $P_q=P[1,\dots ,q]$ el arreglo
+	de los primeros $q$ caracteres del patr\'on P y 
+	$borde[q]=max\{k:$ $k<q$ y $P_k$ es subfijo de $P_q\}$ luego $borde[q]$ es la 
+	longitud del prefijo de P mas grande que es sufijo propio de $P_q$.
+	
+	
+	Ejemplo de tabla de bordes para P='abcabcda'
+	
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}[h]{|c|c |c |c |c |c |c |c |c |}
+			\hline
+			i & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8\\ \hline
+			P & a &b&c&a&b&c&d&a \\ \hline
+			borde & 0& 0& 0& 1& 2 &3& 0& 1 \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	
+	Para aprovechar las comparaciones ya calculadas, por ejemplo si ya
+	se que para algun $s$ tengo que $P_q=T[s+1,\dots ,s+q]$ pero $P[q+1]\neq T[s+q+1]$ 
+	entonces busco el siguiente indice $s'$ desde el cual voy a empezar a comparar. 
+	Este indice $s'$ cumple que es el menor tal que $s'>s$ y $P_k=T[s'+1,\dots ,s'+k]$ con
+	con $s'+k=s+q$, es decir $s'$ es el primer indice potencialmente valido despues de $s$ y
+	de nuestra definici\'on de $borde[q]$ se sigue que $s'=s+(q-borde[q])$.
+	
+	Entonces el algoritmo de KMP consta de dos partes, por un lado el 
+	calculo de la tabla de bordes y por el otro el algorimto de matching
+	que recorre el string sobre todos los potenciales $s$.
+	
+	\subsubsection{Calculo de la tabla de bordes}
+	El siguiente presudocodigo calcula la tabla de bordes de un patron P.
+	
+	\incmargin{1em}
+	\restylealgo{boxed}\linesnumbered
+	\begin{algorithm}
+	\SetKwInOut{Input}{input}
+	\SetKwInOut{Output}{output}
+	\caption{calculoBordes}
+	\Input{Arrglo de caracteres $P$}
+	\Output{Arreglo de enteros}
+	\BlankLine
+
+	$m\leftarrow$ longitud de P\;
+	$borde[1] \leftarrow 0$\;
+	$k\leftarrow 0$\;
+	\For{$q\leftarrow 2$ hasta $m$}{
+		\While{k>0 y P[k+1] es distinto de P[q]}{
+			$k\leftarrow borde[k]$\;
+		}
+		\If{P[k+1] es igual a P[q]}{
+			$k\leftarrow k+1$\;
+		}
+		$borde[q] \leftarrow k$\;
+	}
+	return borde\;
+	\end{algorithm}
+	\decmargin{1em}
+
+	\paragraph{Analicemos la correctitud del calculo de la tabla de bordes,} 
+		para ello defino $borde^*[q] = \{borde[q],borde^2[q],\dots , borde^t[q]\}$ 
+		donde $borde^k[q] = borde[borde^{k-1}[q]]$ y $t$ es el primer
+		$k$ tal que $borde^k[q]=0$. Ademas para $q=2,\dots ,m$ defino
+		$E_{q-1}=\{k:$ $k<q-1$ y $P_{k+1}$ es sufijo de $P_q  \}$. Via el
+		lema 32.5 de \cite{cormen} tenemos que $E_{q-1}=\{k\in borde^*[q-1]:P[k+1]=P[q]\}$.
+		
+		
+		En la linea 2 seteamos $borde[1]=0$ lo cual es correcto por 
+		definicion pues $borde[1]<1$ y $P_0$ es el string vacio que
+		es sufijo de $P_1$. En cada iteracion del bucle For tenemos que
+		$k=borde[q-1]$ por las lineas 2 y 3 y 11. Las lineas $5-9$ ajustan
+		$k$ para sea el valor de $borde[q]$ correspondiente a la iteracion
+		y las lineas $5-6$ buscan entre los valores en $borde^*[q-1]$ hasta
+		que encuentra alguno para el cual valga que $P[k+1]=P[1]$, en ese
+		momento $k$ es el valor mas grande de $E_{q-1}$ entonces por el
+		Coroloario 32.7 de \cite{cormen} podemos setear $borde[q]=k+1$. Si tal
+		$k$ no se encuentra entonces $k=0$ por la linea $6$. Si $P[1]=P[q]$ entonces
+		se setea $k=1$ y $borde[q]=1$ de otra manera $k=0$ y $borde[q]=0$. Luego
+		borde se setea correctamente..
+		
+	\paragraph{Veamos que la complejidad temporal del calculo de borde}
+		resulta lineal en $m$, para ello basta ver
+		que las lineas $5-9$ se ejecutan en total $O(m)$ veces, pero esto
+		es inmediato pues $k$ empieza valiendo 0 entonces en cada iteraci\'on
+		del For aumenta en uno en la linea 9 y descrese en la linea 6 pues $k>borde[k]$,
+		pero siempre k es no negativo.
+		Entonces en el peor caso por cada vez que $k$ aumenta se mete en el while
+		y como $k$ aumenta como mucho m veces entonces se mete en el While
+		como mucho m veces entonces se ejecuta en total $O(m)$ veces.
+	
+	
+	\subsubsection{Matching}
+	\incmargin{1em}
+	\restylealgo{boxed}\linesnumbered
+	\begin{algorithm}[h]
+	\SetKwInOut{Input}{input}
+	\SetKwInOut{Output}{output}
+	\caption{knuthMorrisPratt}
+	\Input{Dos arreglos de enteros P y T}
+	\Output{Entero}
+	\BlankLine
+			$n\leftarrow$longitud T\;
+			$m\leftarrow$longitud P\;
+			$borde\leftarrow$calculoBordes(P)\;
+			$q\leftarrow 0$\;
+			\For{$i\leftarrow 1$ hasta $n$}{
+				\While{q>0 y P[q+1] distinto de T[i]}{
+					$q\leftarrow borde[q]$\;
+				}
+				\If{P[q+1]=T[i]}{
+					$q\leftarrow q+1$\;
+				}
+				\If{q=m}{
+					return $i$\;
+				}
+			}
+			return $-1$ \;
+	\end{algorithm}
+	\decmargin{1em}
+	
+	\paragraph{Verfiquemos la correctitud,} veamos que P es substring de T si y solo 
+		si $KMP(T,P)\neq -1$.
+		
+		
+		Si $P$ es un substring entonces existe m\'inimo $s$ tal que $P=T[s+1,\dots ,s+m]$.
+		
+		Notamos $q_i$ el valor de $q$ al principio de la $i-esima$ iteraci\'on del For.
+		
+		Luego si $i=s+1$ y $q_i=0$ en las iteraciones siguiente del bucle For se
+		van a ejecutar las lineas 9-10 hasta que $q_{i+m}=m-1$.
+		 
+		Si en cambio $i=s+1$ y $q_i>0$ entonces como $s$ es el m\'inimo
+		indice desde el cual coincide se sigue que existe $1\leq j<m$	
+		tal que $P[q_i+j]\neq T[s+j]$ luego en esta iteraci\'on $q_{i+j-1}$ decrece
+		porque entra en el While. Esto se repite 
+		hasta que en alguna iteraci\'on tengo que $i=s+j$ y $q_i=j-1$, 
+		no puede suceder que $q_i<j-1$ pues luego de $m-j$ iteraciones
+		se sigue que $q_{s+m}<m-1$ lo cual es absurdo por hipotesis.
+	
+		
+		Reciprocamente si $j=KMP(T,P)\neq -1$ entonces se tiene que
+		$P[m]=T[j]$ y $q_j=m-1$. Si $m=1$ ya estoy, sino sigo para atras y afirmo 
+		que $P[m-1]=T[j-1]$ pues sino analicemos el valor de $q_{j-1}$. Por
+		un lado tengo que $q_{j-1}<m$ pues sino habria salido de la ejecucion
+		en la iteracion $j-2$. Si $q_{j-1}=m-1$ tengo que $P[m-1]\neq T[j]$ porque
+		sino salgo en este paso entonces $q_{j-1}$ entra en el while y como
+		$P[m-1]\neq T[j-1]$ tengo que $q_{j-1}<m-2$. Absurdo pues como mucho
+		por iteracion aumenta en 1 y $q_j=m-1$.
+	
+	\paragraph{Analisis de complejidad}
+		Para ver que la complejidad de KMP es $O(n)$  basta ver que
+		las lineas 6-11 se ejecutan $O(n)$ veces. 
+		Esto es claro pues el valor de $q$ solo se modifica en las lineas
+		7 y 10, mas aun por cada iteracion del While debe haberse
+		ejecutado la linea 10. Por lo cual en el peor de los casos
+		si contamos que por cada vez que se ejecuto la linea 10 se ejecuto
+		la linea 7 y como la linea 10 se puede ejecutar como mucho $n$ veces
+		entonces la linea 7 se puede ejecutar como mucho $n$ veces, entonces
+		en total el algoritmo tarda $O(n)$.
+	
+	\subsubsection{Conclusi\'on}
+		La complejidad total de la implementacion resulta $O(n)+O(m)=O(n)$
+		,pues $m\leq n$, como queriamos.
+\newpage
+\subsection{Código de la solución}
+\lstset{inputencoding=utf8/latin1}
+\lstinputlisting[numbers = left]{../src/ej1/ej1.cpp}
+
