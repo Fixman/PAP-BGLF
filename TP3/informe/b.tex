@@ -1,11 +1,43 @@
 \newpage{}
 \section{Problema B:  Buscando a los alumnos}
-\textbf{Peso del ejercicio: }
+\textbf{Peso del ejercicio: 9 }
 \subsection{Descripción del problema}
-
+	El problema puede formularse de la siguiente forma. Dado $n \in  \mathbb{N}$ y una lista de strings $S_1, \dots, S_n$ y un prefijo no vacío para cada uno de ellos,  que llamamos $P_1, \dots, P_n$, buscamos el mínimo valor $T$, para el cual vale que para todo $P_i$ con $ 1 \leq i \leq n $ es a su vez prefijo de a lo sumo $T$ prefijos $P_j$ para algún $j$ (incluyendo $i$).
 \subsection{Solución al problema}
 
+	Definamos $g(P,P_i) =
+\left\{\begin{matrix}
+ 1 & \text{P es prefijo de } P_i \\ 
+ 0 & \text{si no}
+\end{matrix}\right.$. Luego, para cada prefijo $P_i$ podemos definir $f(P_i) = \sum\limits_{j = 1}^n g(P_i,P_j)$, que nos dice la cantidad de prefijos $P_j$ para los cuales $P_i$ es prefijo. Notemos entonces que un valor $T$ cumple con la condición del enunciado si y solo si $T \geq f(P_i) \quad \forall 1 \leq i \leq n$, o equivalentemente que $$ \boxed{T \geq \underset{1 \leq i \leq n}{\text{max}} f(P_i) }   $$
+
+	Por otro lado, nosotros queremos minimizar el valor de $T$ de donde se desprende que nuestro problema se resume en calcular $\bf \underset{1 \leq i \leq n}{\textbf{max}} f(P_i)$, pues dicho valor satisface la condición del problema y es el menor posible. Veamos entonces cómo calcular dicho número.
+
+
 \subsection{Algoritmo}
+
+	La idea central será la de utilizar un Trie para almacenar todos los prefijos $P_i$. De ahora en adelante vamos a llamar "palabras" a los prefijos $P$, para no confundirnos al hablar de prefijos de prefijos.
+	
+	 Notemos que un Trie resulta una estructura bastante natural al tener que pensar en prefijos (pues cada nodo del Trie representa un prefijo de alguna palabra). 
+	
+	Con esta idea en mente, lo que queremos almacenar en cada nodo (prefijo), es de cuántas palabras es prefijo, para ello, en cada nodo podemos llevar un contador que guarde de exactamente esa cantidad. Es fácil de mantener, pues al inicializarse comienza en $0$, y al insertar cada palabra podemos aumentar en uno al contador de cada nodo al visitarlo, lo cual cuesta una cantidad $\mathcal{O}(1)$ de operaciones adicionales por cada letra insertada en el Trie.
+	
+	De aquí se deduce que un posible algoritmo para calcular lo pedido es:
+	
+\begin{enumerate}
+	\item Inicializar un Trie $\mathcal{O}(1)$
+	\item Leer todas las direcciones de mail y guardar el prefijo $P_i$ (palabra) explicitado en la entrada. $\mathcal{O}(\bf S)$ 
+	\item Agregar todas las palabras al Trie actualizando el contador. $\mathcal{O}(\bf S)$ 
+	\item Comenzar una variable $r$ en $-1$, donde quedará almacenada la solución al problema (vamos a tomar máximo y -1 es cota inferior a la solución, pues $f(P)$ es la suma de argumentos no negativos). $\mathcal{O}(1)$
+	\item Para cada palabra $P$ almacenada, recorrer en el Trie hasta la última posición de $P$ en el Trie y actualizar $r$ si la cantidad de palabras de las cuales $P$ es prefijo es mayor que $r$. $\mathcal{O}(\bf S)$
+	\item Devolver $r$. $\mathcal{O}(1)$
+\end{enumerate}
+
+\begin{itemize}
+	\item \textbf{Observación 1} En el enunciado se permiten tener strings con minúsculas y mayúsculas del alfabeto inglés, por lo tanto en cada nodo del Trie se puede acotar por $26 \cdot 2 = 52 = \mathcal{O}(1)$ a la cantidad de hijos que tiene.
+	\item \textbf{Observación 2} Como el Trie comienza vacío y en (3) se agregan todas las palabras por las que luego se va a recorrer, no hace falta saber si existe una palabra en el Trie en el punto (5), por lo cual no hace falta guardar en un nodo la informaciónd e si allí termina una palabra.
+	\item \textbf{Observación 3} Si en el enunciado vienen dos strings repetidos, se los cuenta múltiples veces (Asumimos que aparece varias veces en la lista que se despliega al ingresar el prefijo que recuerdan del mail).  
+\end{itemize}
 
 \newpage
 \subsection{Código de la solución}
