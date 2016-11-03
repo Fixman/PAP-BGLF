@@ -1,19 +1,120 @@
 \newpage{}
-\section{Problema D: Diversi\'on asegurada}
+\section{Problema D:\@ Diversión asegurada}
 \textbf{Peso del ejercicio: }
-\subsection{Descripción del problema}
 
-\subsection{Soluciones al problema}
+\newcommand{\mappend}{\operatorname{\bullet}}
+\newcommand{\mempty}{\mathbf{\varepsilon}}
+\newcommand{\sizeV}{\left|V\right|}
 
+\subsection{Introducción Teórica}
 
-\subsubsection{Enfoque naïve}
+\subsubsection{Monoides}
 
+Un monoide es una estructura algebraica que contiene los siguientes elementos.
 
-\subsubsection{Enfoque con componentes fuertemente conexas}
+\begin{itemize}
+	\item Un conjunto de valores \(\mathbb{S}\).
+	\item Una operación asociativa \(\mappend : \mathbb{S} \times \mathbb{S} \rightarrow \mathbb{S}\).
+	\item Un elemento \(\mempty : \mathbb{S}\) que sea nulo respecto a \(\mappend\).
+\end{itemize}
 
+En definitiva, la estructura debe cumplir las siguientes reglas.
 
-\subsection{Algoritmo y Análisis de Complejidad}
+\[
+\begin{aligned}
+	\forall a, b, c \in \mathbb{S}&. \quad a \mappend b \mappend c = (a \mappend b) \mappend c = a \mappend (b \mappend c) \\
+	\forall a \in \mathbb{S}&. \quad a \mappend \mempty = \mempty \mappend a = a
+\end{aligned}
+\]
 
-\newpage
+Generalizar este tipo de estructuras ayuda a simplificar el resto de la explicación del problema.
+
+\subsubsection{Segment Tree}
+
+Dado una secuencia de monoides \(V : \left[\left<\mathbb{S}; \mappend; \mempty\right>\right]\), un segment tree es un árbol binario \(A\) con un elemento \(A_v\) que cumple con las siguientes propiedades:
+
+\begin{itemize}
+	\item Para cada \(a\) hoja de a \(A\), \(a_v\) corresponde a un elemento \(V\).
+	\item \(A\) debe estar \textbf{lleno}: todos los nodos deben tener exactamente \(0\) ó \(2\) hijos.
+	\item Cualquier elemento no-hoja \(f \in A\) tiene hijos \(f_l, f_r \in A\), y su valor es igual a \(f_v = {f_l}_v \mappend {f_r}_v\).
+\end{itemize}
+
+Adicionalmente, para simplificar la estructura agregamos dos reglas.
+
+\begin{itemize}
+	\item \(A\) debe ser \textbf{perfecto}: todas las hojas deben estar al mismo nivel.
+	\item \(A\) contiene \(\sizeV\) hojas con elementos correspondientes a \(V\), y \(r\) hojas con elementos correspondientes a \(\mempty\), donde \(|V| + r\) es una potencia de 2.\footnote{Notar que podríamos representar a cada elemento del árbol con valor opcional y de esta manera no necesitar una estructura con un elemento nulo, pero ¡los opcionales ya son monoides!}
+\end{itemize}
+
+\subsubsection{Range Minimum Query}
+
+Dado un segment tree \(A\), cualquier elemento no-hoja \(f \in A\) que contiene hijos \(l, r \in A\) los cuales corresponden a elementos de una secuencia de monoides \(V\) o a \(\mempty\), va a tener el valor \(l \mappend r\). Esta propiedad se puede extender al elemento \(p\) padre de \(f\), que si contiene \(4\) nietos \(l, r, q, w \in A\), \(p = (l \mappend r) \mappend (q \mappend w)\). Como \(\mappend\) es una operación asociativa, \(p = l \mappend r \mappend q \mappend w\).
+
+De hecho, si la altura de \(A\) es \(h\), cualquier elemento de altura \(j\) va a representar la reducción de \(\mappend\) en \(2^{h - j}\) elementos de \(V\) (o de \(\mempty\)).
+
+Cualquier subsecuencia \(V_i, \dots, V_j\) puede ser representada combinando elementos de \(A\). Tomando \(l(n)\) y \(r(n)\) como los límites de los números de elementos combinados en el nodo \(n \in A\) y \(r\) como su raíz, se puede definir el reductor \(R : A \times \mathbb{N} \times \mathbb{N} \rightarrow S\), que representa la combinación de los elementos entre un par de valores que estén bajo un nodo de la siguiente forma.
+
+\[
+\begin{split}
+	& V_i \mappend \cdots \mappend V_{j - 1} = R(r, i, j) \\
+	& R(n, i, j) =
+	\begin{cases}
+		\mempty &\text{si } \left[l(n), r(n)\right) \cap \left[i, j\right) = \varnothing \\
+		n_v &\text{si } \left[l(n), r(n)\right) \supseteq \left[i, j\right) \\
+		R(n_l) \mappend R(n_r) &\text{sino}
+	\end{cases}
+\end{split}
+\]
+
+Se puede probar correctitud de una manera simple: si el rango buscado y el de \(n\) son disjuntos, entonces el resultado es vacío. Si todos los valores bajo \(n\) corresponden al rango buscado, no tiene sentido bajar a los nodos hijos.
+
+Como todos los valores de \(V\) están representados en \(A\), y todos los nodos se pueden llegar pasando por los hijos de los elementos desde la raíz, la función \(R\) y el algoritmo que lo simule puede combinar los elementos entre cualquier par de números.
+
+\subsection{Complejidad en tiempo}
+
+El árbol \(A\) contiene a cada elemento de \(V\) como hoja. Como es un árbol binario, y a pesar de ser perfecto no tiene más niveles que el árbol mínimo que contiene a estos valores, su tamaño y el tiempo de construcción es \(\bigO(\sizeV)\).
+
+Mirando ingenuamente la definición de \(R\) uno podría pensar que cada query tiene tiempo \(\bigO(2^{\sizeV})\). Sin embargo, es fácil ver que no gracias a algunas propiedades de la query.
+
+Si se calcula \(R\) en dos nodos diferentes \(a, b \in A\) que tengan la misma altura en el árbol:
+\begin{itemize}
+	\item Los dos nodos no van a ser hermanos, ya que en ese caso se calcularía \(R\) para su padre.
+	\item No puede existir un nodo \(c \in A\) al que se le calcule \(R\) que tenga la misma altura que \(a\) y \(b\) y que \(a < c < b\), ya se está calculando la reducción de un rango que se contiene los valores de \(a\) y de \(b\), por lo cual también se debería calcular \(R\) para el hermano de \(c\), y por la regla anterior esto es innecesario.
+\end{itemize}
+
+De esta manera se puede ver que \textbf{se calculan a lo sumo 2 valores por cada nivel del árbol}. Como \(A\) es un árbol binario con \(\bigO(\sizeV)\) nodos, tiene \(\bigO(\log \sizeV)\) niveles. Por lo tanto, calcular cada query tiene complejidad \(\bigO(\log \sizeV)\), y construir un árbol con \(\sizeV\) valores y hacer \(q\) queries tiene complejidad final \(\bigO(\sizeV + q \cdot \log \sizeV)\).
+
+\subsection{Aplicación al problema}
+
+En el problema, se puede definir el monoide \(\left[\left<\mathbb{S}; \mappend; \mempty\right>\right]\) como
+
+\[
+\begin{split}
+	\mathbb{S} &= \left<\mathbb{N}, \mathbb{N}\right> \\
+	\left<q, w\right> \mappend \left<a, s\right> &= \left<\operatorname{max}(q, w, a, s), \operatorname{2^{nd}max}(q, w, a, s)\right> \\
+	\mempty &= \left<0, 0\right>
+\end{split}
+\]
+
+De esta manera, este representa a la mayor y la segunda mayor diversión de un conjunto de días, y su elemento nulo es 0 ya que ningún día puede tener diversión negativa.
+
+Se arma un Segment Tree con estos valores, y por cada query \(\left<P_1, U_1\right>, \dots, \left<P_R, U_R\right>\) se busca combinar los valores entre los elementos \(P_n\) y \(U_n\), que luego se suman. Por la fórmula anterior, esto tiene complejidad \(\bigO(D + R \cdot \log D)\).
+
+\subsection{Casos de Prueba}
+
+\centerline{%
+\begin{tabulary}{1.1\textwidth}{|L|l|L|}
+\hline
+\textbf{Caso de prueba} & \textbf{Archivo de entrada} & \textbf{Salida esperada} \\
+\hline
+Casos de prueba chicos hechos a mano & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4.out} \\ \hline
+La cantidad de días es una potencia de 2 & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_pot2.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_pot2.out} \\ \hline
+La cantidad de días es una potencia de 2 más 1 & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_pot2m1.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_pot2m1.out} \\ \hline
+Todos los queries son del menor tamaño posible & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_borde.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_borde.out} \\ \hline
+Muchos días del año y muchos queries & \textit{ej4\_grande.in} (\(R = 10^5, D = 10^5\)) & El programa termina en \(0.5\) segundos y sin errores. \\ \hline
+\end{tabulary}
+}
+
 \subsection{Código de la solución}
+\lstset{inputencoding=utf8/latin1}
 \lstinputlisting[numbers = left]{../src/ej4/ej4.cpp}

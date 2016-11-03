@@ -17,8 +17,8 @@
 	formalmente verificamos si existe $0\leq s \leq n-m$ tal que 
 	$P[i]=T[s+i]$ para todo $1\leq i \leq m$.
 	
-	\incmargin{1em}
-	\restylealgo{boxed}\linesnumbered
+	% \incmargin{1em}
+	% \restylealgo{boxed}\linesnumbered
 	\begin{algorithm}
 		\SetKwInOut{Input}{input}
 		\SetKwInOut{Output}{output}
@@ -41,7 +41,7 @@
 		}
 		return False\;
 	\end{algorithm}
-	\decmargin{1em}
+	% \decmargin{1em}
 	
 	
 	Si $m=n/2$ entonces el algoritmo hace $\frac{n^2}{4}$ iteraciones
@@ -93,8 +93,8 @@
 	\subsubsection{Calculo de la tabla de bordes}
 	El siguiente presudocodigo calcula la tabla de bordes de un patron P.
 	
-	\incmargin{1em}
-	\restylealgo{boxed}\linesnumbered
+	% \incmargin{1em}
+	% \restylealgo{boxed}\linesnumbered
 	\begin{algorithm}
 	\SetKwInOut{Input}{input}
 	\SetKwInOut{Output}{output}
@@ -117,7 +117,7 @@
 	}
 	return borde\;
 	\end{algorithm}
-	\decmargin{1em}
+	% \decmargin{1em}
 
 	\paragraph{Analicemos la correctitud del calculo de la tabla de bordes,} 
 		para ello defino $borde^*[q] = \{borde[q],borde^2[q],\dots , borde^t[q]\}$ 
@@ -152,8 +152,8 @@
 	
 	
 	\subsubsection{Matching}
-	\incmargin{1em}
-	\restylealgo{boxed}\linesnumbered
+	% \incmargin{1em}
+	% \restylealgo{boxed}\linesnumbered
 	\begin{algorithm}[h]
 	\SetKwInOut{Input}{input}
 	\SetKwInOut{Output}{output}
@@ -178,7 +178,7 @@
 			}
 			return $-1$ \;
 	\end{algorithm}
-	\decmargin{1em}
+	% \decmargin{1em}
 	
 	\paragraph{Verfiquemos la correctitud,} veamos que P es substring de T si y solo 
 		si $KMP(T,P)\neq -1$.
