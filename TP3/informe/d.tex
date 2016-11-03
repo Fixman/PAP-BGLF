@@ -59,9 +59,8 @@ Cualquier subsecuencia \(V_i, \dots, V_j\) puede ser representada combinando ele
 	& V_i \mappend \cdots \mappend V_{j - 1} = R(r, i, j) \\
 	& R(n, i, j) =
 	\begin{cases}
-		% TODO: Cambiar parentesis
-		\mempty &\text{si } \left[l(n), r(n)\right] \cap \left[i, j\right] = \varnothing \\
-		n_v &\text{si } \left[l(n), r(n)\right] \supseteq \left[i, j\right] \\
+		\mempty &\text{si } \left[l(n), r(n)\right) \cap \left[i, j\right) = \varnothing \\
+		n_v &\text{si } \left[l(n), r(n)\right) \supseteq \left[i, j\right) \\
 		R(n_l) \mappend R(n_r) &\text{sino}
 	\end{cases}
 \end{split}
@@ -100,3 +99,22 @@ En el problema, se puede definir el monoide \(\left[\left<\mathbb{S}; \mappend; 
 De esta manera, este representa a la mayor y la segunda mayor diversión de un conjunto de días, y su elemento nulo es 0 ya que ningún día puede tener diversión negativa.
 
 Se arma un Segment Tree con estos valores, y por cada query \(\left<P_1, U_1\right>, \dots, \left<P_R, U_R\right>\) se busca combinar los valores entre los elementos \(P_n\) y \(U_n\), que luego se suman. Por la fórmula anterior, esto tiene complejidad \(\bigO(D + R \cdot \log D)\).
+
+\subsection{Casos de Prueba}
+
+\centerline{%
+\begin{tabulary}{1.1\textwidth}{|L|l|L|}
+\hline
+\textbf{Caso de prueba} & \textbf{Archivo de entrada} & \textbf{Salida esperada} \\
+\hline
+Casos de prueba chicos hechos a mano & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4.out} \\ \hline
+La cantidad de días es una potencia de 2 & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_pot2.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_pot2.out} \\ \hline
+La cantidad de días es una potencia de 2 más 1 & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_pot2m1.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_pot2m1.out} \\ \hline
+Todos los queries son del menor tamaño posible & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_borde.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej4/ej4_borde.out} \\ \hline
+Muchos días del año y muchos queries & \textit{ej4\_grande.in} (\(R = 10^5, D = 10^5\)) & El programa termina en \(0.5\) segundos y sin errores. \\ \hline
+\end{tabulary}
+}
+
+\subsection{Código de la solución}
+\lstset{inputencoding=utf8/latin1}
+\lstinputlisting[numbers = left]{../src/ej4/ej4.cpp}

@@ -67,6 +67,8 @@ class Pair
 	: Pair(n, 0)
 	{
 	}
+
+	friend int main();
 };
 
 // Segment tree para un monoide T.
@@ -101,7 +103,7 @@ class SegmentTree
 		// final de un std::vector es mucho más rápido que agregarlo al inicio sin
 		// tener que crearlo con un montón de elementos vacíos, lo que sería
 		// propenso a errores.
-		std::vector<T> tree(values.size() - nearest_power(values.size()));
+		std::vector<T> tree(2 * nearest_power(values.size()) - values.size());
 		std::copy(values.rbegin(), values.rend(), std::back_inserter(tree));
 
 		for (int k = 0; k < tree.size() - 1; k += 2)
@@ -163,6 +165,8 @@ class SegmentTree
 	: tree(build_tree(values))
 	{
 	}
+
+	friend int main();
 };
 
 int main()
