@@ -1,19 +1,28 @@
 \newpage{}
-\section{Problema D: Diversi\'on asegurada}
+\section{Problema D:\@ Diversión asegurada}
 \textbf{Peso del ejercicio: }
-\subsection{Descripción del problema}
 
-\subsection{Soluciones al problema}
+\newcommand{\mempty}{\mathbf{\varepsilon}}
 
+\subsection{Introducción Teórica}
 
-\subsubsection{Enfoque naïve}
+\subsubsection{Monoides}
 
+Un monoide es una estructura algebraica que contiene los siguientes elementos.
 
-\subsubsection{Enfoque con componentes fuertemente conexas}
+\begin{itemize}
+	\item Un conjunto de valores \(\mathbb{S}\).
+	\item Una operación asociativa \(\bullet : \mathbb{S} \times \mathbb{S} \rightarrow \mathbb{S}\).
+	\item Un elemento \(\mempty : \mathbb{S}\) que sea nulo respecto a \(\bullet\).
+\end{itemize}
 
+En definitiva, la estructura debe cumplir las siguientes reglas.
 
-\subsection{Algoritmo y Análisis de Complejidad}
+\[
+\begin{aligned}
+	\forall a, b, c \in \mathbb{S}&. \quad a \bullet b \bullet c = (a \bullet b) \bullet c = a \bullet (b \bullet c) \\
+	\forall a \in \mathbb{S}&. \quad a \bullet \mempty = \mempty \bullet a = a
+\end{aligned}
+\]
 
-\newpage
-\subsection{Código de la solución}
-\lstinputlisting[numbers = left]{../src/ej4/ej4.cpp}
+Generalizar este tipo de estructuras ayuda a simplificar el resto de la explicación del problema.

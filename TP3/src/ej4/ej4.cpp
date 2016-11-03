@@ -11,7 +11,7 @@
 constexpr long nearest_power(long n)
 {
 	assert(n > 0);
-	return 1ull << 8 * sizeof(long) - clz(n) - 1;
+	return 1u << 8 * sizeof(long) - clz(n) - 1;
 }
 
 // Representa un par de números con operaciones respectivas a un monoide con
@@ -101,7 +101,7 @@ class SegmentTree
 		// final de un std::vector es mucho más rápido que agregarlo al inicio sin
 		// tener que crearlo con un montón de elementos vacíos, lo que sería
 		// propenso a errores.
-		std::vector <T> tree(values.size() - nearest_power(values.size()));
+		std::vector<T> tree(values.size() - nearest_power(values.size()));
 		std::copy(values.rbegin(), values.rend(), std::back_inserter(tree));
 
 		for (int k = 0; k < tree.size() - 1; k += 2)
@@ -125,7 +125,7 @@ class SegmentTree
 		// Aprovechando las propiedades de los árboles binarios, se puede calcular
 		// la altura a la que se encuentra este nodo y su rango solamente con
 		// su número, sin guardar nada en memoria y en tiempo O(1).
-		unsigned int h = 1ull << clz(n) - clz(tree.size()) - 1;
+		unsigned int h = 1u << clz(n) - clz(tree.size()) - 1;
 		int l = (n - nearest_power(n)) * h;
 		int r = (n - nearest_power(n) + 1) * h;
 
