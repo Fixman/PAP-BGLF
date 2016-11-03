@@ -1,8 +1,8 @@
 \newpage{}
 \section{Problema B:  Buscando a los alumnos}
-\textbf{Peso del ejercicio: 9 }
+\textbf{Peso del ejercicio: 10 }
 \subsection{Descripción del problema}
-	El problema puede formularse de la siguiente forma. Dado $n \in  \mathbb{N}$ y una lista de strings $S_1, \dots, S_n$ y un prefijo no vacío para cada uno de ellos,  que llamamos $P_1, \dots, P_n$, buscamos el mínimo valor $T$, para el cual vale que para todo $P_i$ con $ 1 \leq i \leq n $ es a su vez prefijo de a lo sumo $T$ prefijos $P_j$ para algún $j$ (incluyendo $i$).
+	El problema puede formularse de la siguiente forma. Dado $n \in  \mathbb{N}$ y una lista de strings $S_1, \dots, S_n$ y un prefijo no vacío para cada uno de ellos,  que llamamos $P_1, \dots, P_n$, buscamos el mínimo valor $T$, para el cual vale que para todo $P_i$ con $ 1 \leq i \leq n $ es a su vez prefijo de a lo sumo $T$ prefijos $P_j$ para algunos $j$ (incluyendo $i$).
 \subsection{Solución al problema}
 
 	Definamos $g(P,P_i) =
@@ -16,11 +16,30 @@
 
 \subsection{Algoritmo}
 
-	La idea central será la de utilizar un Trie para almacenar todos los prefijos $P_i$. De ahora en adelante vamos a llamar "palabras" a los prefijos $P$, para no confundirnos al hablar de prefijos de prefijos.
+\subsubsection{Detalles de Implementación}
+
+	Como vimos, todo el problema se resume en calcular un número a partir de los strings. La idea central para calcularlo será la de utilizar un Trie para almacenar todos los prefijos $P_i$. De ahora en adelante vamos a llamar "palabras" a los prefijos $P$, para no confundirnos al hablar de prefijos de prefijos.
 	
 	 Notemos que un Trie resulta una estructura bastante natural al tener que pensar en prefijos (pues cada nodo del Trie representa un prefijo de alguna palabra). 
 	
-	Con esta idea en mente, lo que queremos almacenar en cada nodo (prefijo), es de cuántas palabras es prefijo, para ello, en cada nodo podemos llevar un contador que guarde de exactamente esa cantidad. Es fácil de mantener, pues al inicializarse comienza en $0$, y al insertar cada palabra podemos aumentar en uno al contador de cada nodo al visitarlo, lo cual cuesta una cantidad $\mathcal{O}(1)$ de operaciones adicionales por cada letra insertada en el Trie.
+	Con esta idea en mente, lo que queremos almacenar en cada nodo (prefijo), es de cuántas palabras es prefijo, para ello, en cada nodo podemos llevar un contador que guarde de exactamente esa cantidad. Es fácil de mantener, pues al inicializarse comienza en $0$, y al insertar cada palabra podemos aumentar en uno al contador de cada nodo al visitarlo (por ejemplo, al agregar "ABBA" en un trie, se suma uno a los nodos que representan los prefijos "A","AB","ABB","ABBA"), lo cual cuesta una cantidad $\mathcal{O}(1)$ de operaciones adicionales por cada letra de una palabra insertada en el Trie.
+	
+	Teniendo esto, podemos volver a recorrer cada palabra y saber de cuántas otras palabras es prefijo (es el número guardado en la última letra correspondiente a la palabra en el trie).
+	
+\subsubsection{Estructura del Trie}
+
+Vamos a pensar a un Trie como un \textsc{Nodo}. Donde un \textsc{Nodo} solo almacena dos cosas.
+\begin{enumerate}
+	\item Un entero \textsc{CantidadPrefijos} $\in \mathbb{Z}$, que se inicializa en $0$, donde actualizaremos la cantidad de palabras que tienen a dicho prefijo.
+	\item Un conjunto de $\textsc{Nodo}'s$ que llamamos \textsc{Hijos}. Inicialmente \textsc{Hijos} $ = \emptyset$, y al tener que utilizar un \textsc{Nodo}, se inicializan $ 52 \textsc{ Nodo}'s$ en \textsc{Hijos} (notar que cada uno de estos \textsc{Nodo}'s, tiene al conjunto de \textsc{Hijos} vacío)
+\end{enumerate}
+
+
+\begin{itemize}
+		\item \textbf{Observación 1:} En el enunciado se permiten tener strings con minúsculas y mayúsculas del alfabeto inglés, por lo tanto en cada nodo del Trie se puede acotar por $26 \cdot 2 = 52 = \mathcal{O}(1)$ a la cantidad de hijos que tiene.
+\end{itemize}
+
+\subsubsection{Algoritmo Detallado y Análisis de Complejidad }
 	
 	De aquí se deduce que un posible algoritmo para calcular lo pedido es:
 	
@@ -30,13 +49,14 @@
 	\item Agregar todas las palabras al Trie actualizando el contador. $\mathcal{O}(\bf S)$ 
 	\item Comenzar una variable $r$ en $-1$, donde quedará almacenada la solución al problema (vamos a tomar máximo y -1 es cota inferior a la solución, pues $f(P)$ es la suma de argumentos no negativos). $\mathcal{O}(1)$
 	\item Para cada palabra $P$ almacenada, recorrer en el Trie hasta la última posición de $P$ en el Trie y actualizar $r$ si la cantidad de palabras de las cuales $P$ es prefijo es mayor que $r$. $\mathcal{O}(\bf S)$
-	\item Devolver $r$. $\mathcal{O}(1)$
+	\item Imprimir $r$. $\mathcal{O}(1)$
 \end{enumerate}
 
+De donde se desprende que la complejidad total del algoritmo es $\mathcal{O}(\bf S)$
+
 \begin{itemize}
-	\item \textbf{Observación 1} En el enunciado se permiten tener strings con minúsculas y mayúsculas del alfabeto inglés, por lo tanto en cada nodo del Trie se puede acotar por $26 \cdot 2 = 52 = \mathcal{O}(1)$ a la cantidad de hijos que tiene.
-	\item \textbf{Observación 2} Como el Trie comienza vacío y en (3) se agregan todas las palabras por las que luego se va a recorrer, no hace falta saber si existe una palabra en el Trie en el punto (5), por lo cual no hace falta guardar en un nodo la informaciónd e si allí termina una palabra.
-	\item \textbf{Observación 3} Si en el enunciado vienen dos strings repetidos, se los cuenta múltiples veces (Asumimos que aparece varias veces en la lista que se despliega al ingresar el prefijo que recuerdan del mail).  
+	\item \textbf{Observación 2:} Como el Trie comienza vacío y en (3) se agregan todas las palabras por las que luego se va a recorrer, no hace falta saber si existe una palabra en el Trie en el punto (5), por lo cual no hace falta guardar en un nodo la información de si allí termina una palabra.
+	\item \textbf{Observación 3:} Si en el enunciado vienen dos strings repetidos, se los cuenta múltiples veces (Asumimos que aparece varias veces en la lista que se despliega al ingresar el prefijo que recuerdan del mail).  
 \end{itemize}
 
 \newpage
