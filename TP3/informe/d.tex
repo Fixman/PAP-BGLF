@@ -35,7 +35,7 @@ Dado una secuencia de monoides \(V : \left[\left<\mathbb{S}; \mappend; \mempty\r
 \begin{itemize}
 	\item Para cada \(a\) hoja de a \(A\), \(a_v\) corresponde a un elemento \(V\).
 	\item \(A\) debe estar \textbf{lleno}: todos los nodos deben tener exactamente \(0\) ó \(2\) hijos.
-	\item Cualquier elemento no-hoja \(f \in A\) con hijos \(l, r \in A\) tiene el valor \(f_v = l_v \mappend r_v\).
+	\item Cualquier elemento no-hoja \(f \in A\) tiene hijos \(f_l, f_r \in A\), y su valor es igual a \(f_v = {f_l}_v \mappend {f_r}_v\).
 \end{itemize}
 
 Adicionalmente, para simplificar la estructura agregamos dos reglas.
@@ -51,7 +51,7 @@ Dado un segment tree \(A\), cualquier elemento no-hoja \(f \in A\) que contiene 
 
 De hecho, si la altura de \(A\) es \(h\), cualquier elemento de altura \(j\) va a representar la reducción de \(\mappend\) en \(2^{h - j}\) elementos de \(V\) (o de \(\mempty\)).
 
-Cualquier subsecuencia \(V_i, \dots, V_j\) puede ser representada combinando elementos de \(A\). Tomando \(l(n)\) y \(r(n)\) como los límites de los números de elementos combinados en el nodo \(n \in A\) y \(r\) como su raíz, se puede definir el reductor \(R : A \times \mathbb{N} \times \mathbb{N} \rightarrow S\) de la siguiente forma.
+Cualquier subsecuencia \(V_i, \dots, V_j\) puede ser representada combinando elementos de \(A\). Tomando \(l(n)\) y \(r(n)\) como los límites de los números de elementos combinados en el nodo \(n \in A\) y \(r\) como su raíz, se puede definir el reductor \(R : A \times \mathbb{N} \times \mathbb{N} \rightarrow S\), que representa la combinación de los elementos entre un par de valores que estén bajo un nodo de la siguiente forma.
 
 \[
 \begin{split}
@@ -65,6 +65,10 @@ Cualquier subsecuencia \(V_i, \dots, V_j\) puede ser representada combinando ele
 	\end{cases}
 \end{split}
 \]
+
+Se puede probar correctitud de una manera simple: si el rango buscado y el de \(n\) son disjuntos, entonces el resultado es vacío. Si todos los valores bajo \(n\) corresponden al rango buscado, no tiene sentido bajar a los nodos hijos.
+
+Como todos los valores de \(V\) están representados en \(A\), y todos los nodos se pueden llegar pasando por los hijos de los elementos desde la raíz, la función \(R\) y el algoritmo que lo simule puede combinar los elementos entre cualquier par de números.
 
 % \begin{algorithm}
 % 	\SetKwInOut{Input}{input}
