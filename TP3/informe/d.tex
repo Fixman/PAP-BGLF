@@ -4,6 +4,7 @@
 
 \newcommand{\mappend}{\operatorname{\bullet}}
 \newcommand{\mempty}{\mathbf{\varepsilon}}
+\newcommand{\sizeV}{\left|V\right|}
 
 \subsection{Introducción Teórica}
 
@@ -42,7 +43,7 @@ Adicionalmente, para simplificar la estructura agregamos dos reglas.
 
 \begin{itemize}
 	\item \(A\) debe ser \textbf{perfecto}: todas las hojas deben estar al mismo nivel.
-	\item \(A\) contiene \(\left|V\right|\) hojas con elementos correspondientes a \(V\), y \(r\) hojas con elementos correspondientes a \(\mempty\), donde \(|V| + r\) es una potencia de 2.\footnote{Notar que podríamos representar a cada elemento del árbol con valor opcional y de esta manera no necesitar una estructura con un elemento nulo, pero ¡los opcionales ya son monoides!}
+	\item \(A\) contiene \(\sizeV\) hojas con elementos correspondientes a \(V\), y \(r\) hojas con elementos correspondientes a \(\mempty\), donde \(|V| + r\) es una potencia de 2.\footnote{Notar que podríamos representar a cada elemento del árbol con valor opcional y de esta manera no necesitar una estructura con un elemento nulo, pero ¡los opcionales ya son monoides!}
 \end{itemize}
 
 \subsubsection{Range Minimum Query}
@@ -70,19 +71,32 @@ Se puede probar correctitud de una manera simple: si el rango buscado y el de \(
 
 Como todos los valores de \(V\) están representados en \(A\), y todos los nodos se pueden llegar pasando por los hijos de los elementos desde la raíz, la función \(R\) y el algoritmo que lo simule puede combinar los elementos entre cualquier par de números.
 
-% \begin{algorithm}
-% 	\SetKwInOut{Input}{input}
-% 	\SetKwInOut{Output}{output}
-% 	\Input{Un segment tree A}
-% 	\Input{Dos enteros \(0 \leq i < j < \left|V\right|\)}
-% 	\Output{\(V_i \mappend \cdots \mappend V_{j - 1}\)}
-% 
-% 	\BlankLine{}
-% 	\SetKwProg{Fn}{Function}{}{}
-% 	\Fn{getNodeSum (n)}{%
-% 		\If{\(\left[l(n), r(n)\right] \cap \left[i, j\right] = \varempty\)}{
-% 			\
-% 	}
-% 
-% 	\caption{Range Minimum Query}
-% \end{algorithm}
+\subsection{Complejidad en tiempo}
+
+El árbol \(A\) contiene a cada elemento de \(V\) como hoja. Como es un árbol binario, y a pesar de ser perfecto no tiene más niveles que el árbol mínimo que contiene a estos valores, su tamaño y el tiempo de construcción es \(\bigO(\sizeV)\).
+
+Mirando ingenuamente la definición de \(R\) uno podría pensar que cada query tiene tiempo \(\bigO(2^{\sizeV})\). Sin embargo, es fácil ver que no gracias a algunas propiedades de la query.
+
+Si se calcula \(R\) en dos nodos diferentes \(a, b \in A\) que tengan la misma altura en el árbol:
+\begin{itemize}
+	\item Los dos nodos no van a ser hermanos, ya que en ese caso se calcularía \(R\) para su padre.
+	\item No puede existir un nodo \(c \in A\) al que se le calcule \(R\) que tenga la misma altura que \(a\) y \(b\) y que \(a < c < b\), ya se está calculando la reducción de un rango que se contiene los valores de \(a\) y de \(b\), por lo cual también se debería calcular \(R\) para el hermano de \(c\), y por la regla anterior esto es innecesario.
+\end{itemize}
+
+De esta manera se puede ver que \textbf{se calculan a lo sumo 2 valores por cada nivel del árbol}. Como \(A\) es un árbol binario con \(\bigO(\sizeV)\) nodos, tiene \(\bigO(\log \sizeV)\) niveles. Por lo tanto, calcular cada query tiene complejidad \(\bigO(\log \sizeV)\), y construir un árbol con \(\sizeV\) valores y hacer \(q\) queries tiene complejidad final \(\bigO(\sizeV + q \cdot \log \sizeV)\).
+
+\subsection{Aplicación al problema}
+
+En el problema, se puede definir el monoide \(\left[\left<\mathbb{S}; \mappend; \mempty\right>\right]\) como
+
+\[
+\begin{split}
+	\mathbb{S} &= \left<\mathbb{N}, \mathbb{N}\right> \\
+	\left<q, w\right> \mappend \left<a, s\right> &= \left<\operatorname{max}(q, w, a, s), \operatorname{2^{nd}max}(q, w, a, s)\right> \\
+	\mempty &= \left<0, 0\right>
+\end{split}
+\]
+
+De esta manera, este representa a la mayor y la segunda mayor diversión de un conjunto de días, y su elemento nulo es 0 ya que ningún día puede tener diversión negativa.
+
+Se arma un Segment Tree con estos valores, y por cada query \(\left<P_1, U_1\right>, \dots, \left<P_R, U_R\right>\) se busca combinar los valores entre los elementos \(P_n\) y \(U_n\), que luego se suman. Por la fórmula anterior, esto tiene complejidad \(\bigO(D + R \cdot \log D)\).
