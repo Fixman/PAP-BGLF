@@ -60,7 +60,9 @@ tint char2Number (char x)
 
 /* Como precondicion de "agregarPalabra" se tiene que:
   
- 1) 0 <= indice <= palabra.size()
+ 1) Para agregar una palabra entera, se debe llamar con "trie" como el 
+ * nodo raiz del trie, e "indice" igual a cero.
+ 2) 0 <= indice <= palabra.size()
 
 */ 
 
@@ -96,7 +98,6 @@ tint prefijosPalabra (Nodo &trie, string &palabra, tint indice)
 		return trie.cantidadPrefijos;
 }
 
- 
 int main()
 {
 	ios::sync_with_stdio(false);
@@ -109,8 +110,7 @@ int main()
 	{
 		Nodo trie = crearNodo(); 	// Creamos la raiz del trie
 		vector<string> mail (n); 	// Aqui guardaremos todos los prefijos
-									// que recuerdan de los mails
-								 
+									// que recuerdan de los mails					 
 		forn(i,n)
 		{
 			string d; 	// mail
@@ -118,7 +118,7 @@ int main()
 			cin >> d >> p; 	// lectura de la entrada
 			mail[i] = d.substr(0,p); 	// Nos quedamos con el prefijo
 			agregarPalabra(trie,mail[i],0);	// Agregamos el prefijo en
-											// 	en el Trie
+											// 	el Trie
 											
 		}
 		
