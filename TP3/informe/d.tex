@@ -2,6 +2,7 @@
 \section{Problema D:\@ Diversión asegurada}
 \textbf{Peso del ejercicio: }
 
+\newcommand{\mappend}{\operatorname{\bullet}}
 \newcommand{\mempty}{\mathbf{\varepsilon}}
 
 \subsection{Introducción Teórica}
@@ -12,17 +13,72 @@ Un monoide es una estructura algebraica que contiene los siguientes elementos.
 
 \begin{itemize}
 	\item Un conjunto de valores \(\mathbb{S}\).
-	\item Una operación asociativa \(\bullet : \mathbb{S} \times \mathbb{S} \rightarrow \mathbb{S}\).
-	\item Un elemento \(\mempty : \mathbb{S}\) que sea nulo respecto a \(\bullet\).
+	\item Una operación asociativa \(\mappend : \mathbb{S} \times \mathbb{S} \rightarrow \mathbb{S}\).
+	\item Un elemento \(\mempty : \mathbb{S}\) que sea nulo respecto a \(\mappend\).
 \end{itemize}
 
 En definitiva, la estructura debe cumplir las siguientes reglas.
 
 \[
 \begin{aligned}
-	\forall a, b, c \in \mathbb{S}&. \quad a \bullet b \bullet c = (a \bullet b) \bullet c = a \bullet (b \bullet c) \\
-	\forall a \in \mathbb{S}&. \quad a \bullet \mempty = \mempty \bullet a = a
+	\forall a, b, c \in \mathbb{S}&. \quad a \mappend b \mappend c = (a \mappend b) \mappend c = a \mappend (b \mappend c) \\
+	\forall a \in \mathbb{S}&. \quad a \mappend \mempty = \mempty \mappend a = a
 \end{aligned}
 \]
 
 Generalizar este tipo de estructuras ayuda a simplificar el resto de la explicación del problema.
+
+\subsubsection{Segment Tree}
+
+Dado una secuencia de monoides \(V : \left[\left<\mathbb{S}; \mappend; \mempty\right>\right]\), un segment tree es un árbol binario \(A\) con un elemento \(A_v\) que cumple con las siguientes propiedades:
+
+\begin{itemize}
+	\item Para cada \(a\) hoja de a \(A\), \(a_v\) corresponde a un elemento \(V\).
+	\item \(A\) debe estar \textbf{lleno}: todos los nodos deben tener exactamente \(0\) ó \(2\) hijos.
+	\item Cualquier elemento no-hoja \(f \in A\) con hijos \(l, r \in A\) tiene el valor \(f_v = l_v \mappend r_v\).
+\end{itemize}
+
+Adicionalmente, para simplificar la estructura agregamos dos reglas.
+
+\begin{itemize}
+	\item \(A\) debe ser \textbf{perfecto}: todas las hojas deben estar al mismo nivel.
+	\item \(A\) contiene \(\left|V\right|\) hojas con elementos correspondientes a \(V\), y \(r\) hojas con elementos correspondientes a \(\mempty\), donde \(|V| + r\) es una potencia de 2.\footnote{Notar que podríamos representar a cada elemento del árbol con valor opcional y de esta manera no necesitar una estructura con un elemento nulo, pero ¡los opcionales ya son monoides!}
+\end{itemize}
+
+\subsubsection{Range Minimum Query}
+
+Dado un segment tree \(A\), cualquier elemento no-hoja \(f \in A\) que contiene hijos \(l, r \in A\) los cuales corresponden a elementos de una secuencia de monoides \(V\) o a \(\mempty\), va a tener el valor \(l \mappend r\). Esta propiedad se puede extender al elemento \(p\) padre de \(f\), que si contiene \(4\) nietos \(l, r, q, w \in A\), \(p = (l \mappend r) \mappend (q \mappend w)\). Como \(\mappend\) es una operación asociativa, \(p = l \mappend r \mappend q \mappend w\).
+
+De hecho, si la altura de \(A\) es \(h\), cualquier elemento de altura \(j\) va a representar la reducción de \(\mappend\) en \(2^{h - j}\) elementos de \(V\) (o de \(\mempty\)).
+
+Cualquier subsecuencia \(V_i, \dots, V_j\) puede ser representada combinando elementos de \(A\). Tomando \(l(n)\) y \(r(n)\) como los límites de los números de elementos combinados en el nodo \(n \in A\) y \(r\) como su raíz, se puede definir el reductor \(R : A \times \mathbb{N} \times \mathbb{N} \rightarrow S\) de la siguiente forma.
+
+\[
+\begin{split}
+	& V_i \mappend \cdots \mappend V_{j - 1} = R(r, i, j) \\
+	& R(n, i, j) =
+	\begin{cases}
+		% TODO: Cambiar parentesis
+		\mempty &\text{si } \left[l(n), r(n)\right] \cap \left[i, j\right] = \varnothing \\
+		n_v &\text{si } \left[l(n), r(n)\right] \supseteq \left[i, j\right] \\
+		R(n_l) \mappend R(n_r) &\text{sino}
+	\end{cases}
+\end{split}
+\]
+
+% \begin{algorithm}
+% 	\SetKwInOut{Input}{input}
+% 	\SetKwInOut{Output}{output}
+% 	\Input{Un segment tree A}
+% 	\Input{Dos enteros \(0 \leq i < j < \left|V\right|\)}
+% 	\Output{\(V_i \mappend \cdots \mappend V_{j - 1}\)}
+% 
+% 	\BlankLine{}
+% 	\SetKwProg{Fn}{Function}{}{}
+% 	\Fn{getNodeSum (n)}{%
+% 		\If{\(\left[l(n), r(n)\right] \cap \left[i, j\right] = \varempty\)}{
+% 			\
+% 	}
+% 
+% 	\caption{Range Minimum Query}
+% \end{algorithm}
