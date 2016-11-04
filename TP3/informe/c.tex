@@ -2,10 +2,110 @@
 \section{Problema C: Ciencia argentina}
 \textbf{Peso del ejercicio: 8}
 \subsection{Descripción del problema}
+Dada una tabla $M$ de dimensiones $C \times A$, que contiene montos por 
+cargo y por antigüedad docente, se sabe que el sueldo de un docente 
+con cargo $c$ y antigüedad $a$ cobra todos los montos $M_{i,j}$ 
+con $1 \leq i \leq c$ y $1 \leq j \leq a$. 
+
+Se nos dan $Q$ queries, en las que en cada una debemos responder lo siguiente: 
+dados un cargo $c_1$ y antigüedad $a_1$ de un docente, y el cargo $c_2$ y antigüedad $a_2$ a 
+la que aspira llegar a fin de año, ?`qué parte de su sueldo cobraría si tuviera cargo y antigüedad 
+$c_2$ y $a_2$, que no podría cobrar teniendo cargo $c_1$ (aún si obtuviese antigüedad $a_2$) o teniendo 
+antigüedad $a_2$ (aún si obtuviese el cargo $c_2$)?
+
+Es decir, cada respuesta es la suma de los montos que cobra un docente con cargo y antigüedad 
+$c_2$ y $a_2$, que no pueden cobrar docentes que tengan cargo $c_1$ o antigüedad $a_1$.
+
+El algoritmo debe tener complejidad $\mathcal{O}(AC + Q)$. 
 
 \subsection{Soluciones al problema}
 
+En base a lo que nos describe el enunciado, asumiremos primero por un momento 
+que $c_1 \leq c_2$ y $a_1 \leq a_2$, dado que un docente buscaría escalar en 
+cargo y antigüedad en lugar de bajar. 
+
+Siendo así, como cada query nos pide 
+la suma de los montos que un docente con cargo $c_2$ y antigüedad $a_2$ puede cobrar, 
+pero no uno con cargo $c_1$ (con antigüedad desde 1 hasta $a_2$) o 
+antigüedad $a_2$ (con cargo desde 1 hasta $c_2$), en definitiva lo que se nos pide 
+es la suma de los montos en el rectángulo que va desde $(c_1+1,a_1+1)$ hasta $(c_2, a_2)$ 
+(agregamos 1 a los índices porque no queremos incluir montos de $c_1$ o $a_1$ en ese rango). 
+
+Dicho de otra forma, lo que queremos para cada query es: 
+
+\begin{equation}
+Q(c_1, a_1, c_2, a_2) = \sum\limits_{i = c_1+1}^{c_2} \sum\limits_{j = a_1+1}^{a_2} M_{i,j}
+\end{equation}
+
+\subsubsection*{Solución naïve}
+Si para cada query computamos la suma requerida simplemente iterando sobre los elementos 
+de $M$ que necesitamos, cada query la estaríamos respondiend en $\mathcal{O}(AC)$, porque potencialmente 
+una query podría ser de una rectángulo que ocupe toda la tabla. Necesitaríamos una solución 
+que nos permita computar cada query en $\mathcal{O}(1)$. 
+
+Tampoco podemos precomputar todas las queries posibles porque en total son $\mathcal{O}((AC)^2)$ 
+posibles combinaciones, así que tampoco es viable.  
+
+\subsubsection*{Solución con tablita aditiva}
+Lo que podemos hacer es utilizar la estrucura de ``tablita aditiva'' sobre $M$ 
+para poder responder las queries rápidamente. 
+
+La idea sería tener precómputado en otra tabla $T$ de las mismas dimensiones, en cada 
+posición $(i,j)$, la suma de todos los elementos de $M$ en el rectángulo que va desde el $(1,1)$ 
+hasta $(i,j)$, es decir 
+
+\begin{equation}
+T_{i,j} = \sum\limits_{a = 1}^{i} \sum\limits_{b = 1}^{j} M_{a,b}
+\end{equation}
+
+Teniendo esto, podremos responder cada query en $\mathcal{O}(1)$, veremos ahora 
+cómo, y cómo precomputar esta tabla. 
+
+
 \subsection{Algoritmo}
+
+Veamos primero cómo se calculas los valores de $T$ que usaremos para responder las queries. 
+
+\subsubsection*{Precómputo de la tabla aditiva}
+Para llenar la tabla $T$ usaremos un algoritmo basado en programación dinámica, 
+donde usaremos valores de $T$ de menor índice para calcular los de índices más grandes. 
+
+Queremos en $T_{i,j}$ la suma antes mencionada, podemos separar en algunos casos: 
+\begin{itemize}
+\item Si $i = j = 1$, el rectángulo que estamos queriendo sumar tiene solamente el 
+elemento $(1,1)$, entonces simplemente $T_{1,1} = M_{1,1}$. 
+
+\item Si $i = 1$ y $j > 1$, es decir, estamos parados sobre la primer fila de $T$. 
+Si tenemos ya calculado $T_{1,j-1}$, esto es la suma de la primer fila hasta la 
+columna $j-1$. Si a esto le agregamos el elemento $M_{1,j}$, tenemos exactamente la 
+suma de la primer fila hasta la columna $j$, que es lo que queremos en $T_{1,j}$. 
+
+Análogamente, podemos resolver el caso $i > 1$ y $j = 1$, es decir la primer columna, 
+de una manera similar. 
+
+\item El caso general, donde $i > 1$ y $j > 1$. Nuevamente podemos usar valores de $T$ más 
+chicos que ya hayamos calculado. Primero que nada necesitaremos el elemento $M_{i,j}$. 
+A esto podemos agregarle la suma de los elementos que están a su izquierda y arriba, 
+en principio podemos obtenerlos de $T_{i,j-1}$ y $T_{i-1,j}$. Sumando estas tres tenemos: 
+
+\begin{equation}
+M_{i,j} + T_{i,j-1} + T_{i-1,j} = M_{i,j} + \sum\limits_{a = 1}^{i} \sum\limits_{b = 1}^{j-1} M_{a,b} + \sum\limits_{a = 1}^{i-1} \sum\limits_{b = 1}^{j} M_{a,b}
+\end{equation}
+
+
+\begin{equation}
+M_{i,j} + T_{i,j-1} + T_{i-1,j} = \sum\limits_{a = 1}^{i} \sum\limits_{b = 1}^{j} M_{a,b} + \sum\limits_{a = 1}^{i-1} \sum\limits_{b = 1}^{j-1} M_{a,b}
+\end{equation}
+
+Con estas 3 cosas obtenemos el rango de valores que queremos, pero además nos está sobrando 
+todo el rectángulo que va desde el $(1,1)$ hasta el $(i-1,j-1)$. Pero esto es exactamente lo 
+que tenemos en $T_{i-1,j-1}$, de modo que podemos restarlo y obtenemos 
+
+\begin{equation}
+M_{i,j} + T_{i,j-1} + T_{i-1,j} - T_{i-1,j-1} = \sum\limits_{a = 1}^{i} \sum\limits_{b = 1}^{j} M_{a,b}
+\end{equation}
+
+\end{itemize}
 
 \subsubsection*{Análisis de complejidad}
 
