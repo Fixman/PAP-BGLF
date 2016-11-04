@@ -35,6 +35,7 @@ Dicho de otra forma, lo que queremos para cada query es:
 
 \begin{equation}
 Q(c_1, a_1, c_2, a_2) = \sum\limits_{i = c_1+1}^{c_2} \sum\limits_{j = a_1+1}^{a_2} M_{i,j}
+\ref{res-query}
 \end{equation}
 
 \subsubsection*{Solución naïve}
@@ -107,7 +108,93 @@ M_{i,j} + T_{i,j-1} + T_{i-1,j} - T_{i-1,j-1} = \sum\limits_{a = 1}^{i} \sum\lim
 
 \end{itemize}
 
-\subsubsection*{Análisis de complejidad}
+Resumiendo entonces tenemos que la función para calcular los valores de $T$ es 
+
+\begin{align*}
+T_{i,j} =
+	&\begin{cases}
+		M_{i,j} & \text{si $i=1$ y $j=1$} \\
+		M_{i,j} + T_{i,j-1} & \text{si $i=1$ y $j > 1$} \\
+		M_{i,j} + T_{i-1,j} & \text{si $j=1$ y $i > 1$} \\
+		M_{i,j} + T_{i,j-1} + T_{i-1,j} - T_{i-,j-1} & \text{si $j>1$ y $i > 1$} \\
+	\end{cases} \\
+\end{align*}
+
+Se puede ver que cada valor de $T$ depende únicamente de valores de $T$ 
+con índices menores, o valores de $M$, de modo que podemos calcularlos en 
+orden y cada uno tendría complejidad constante. 
+
+\begin{algorithm}[H]
+$T_{1,1}$ $\leftarrow$ $M_{1,1}$\;
+\For{$i$ desde 2 hasta $C$}{
+	$T_{i,1}$ $\leftarrow$ $M_{i,1} + T_{i-1,1}$\;
+}
+\For{$j$ desde 2 hasta $A$}{
+	$T_{1,j}$ $\leftarrow$ $M_{1,j} + T_{1,j-1}$\;
+}
+\For{$i$ desde 2 hasta $C$}{
+\For{$j$ desde 2 hasta $A$}{
+	$T_{i,j}$ $\leftarrow$ $M_{i,j} + T_{i,j-1} + T_{i-1,j} - T_{i-,j-1}$\;
+}
+}
+\caption{Precómputo de la tabla aditiva}
+\end{algorithm}
+
+Podemos ver que cada valor de $T$ lo calculamos con una cantidad constante 
+de operaciones aritméticas, por tanto computar cada valor tiene complejidad constante. 
+Como $T$ es de $C \times A$ al igual que $M$, el precómputo tiene complejidad 
+$\bigO(AC)$.
+
+
+\subsubsection*{Resolución de las queries}
+Como dijimos antes, la idea será usar la tabla $T$ con las sumas precomputadas 
+para poder responder las queries en tiempo constante. Dada una query con valores 
+$c_1, a_1, c_2, a_2$, la respuesta que buscamos es la suma de valores de $M$ en el 
+rectángulo desde $(c_1+1, a_1+1)$ a $(c_2,a_2)$. 
+
+En principio podemos tomar $T_{c_2,a_2}$, que contiene la sumatoria de los 
+elementos de $M$ hasta $(c_2,a_2)$, pero debemos quitarle varias secciones. 
+
+Si queremos restar los elementos de $M$ que están en las filas 1 a $c_1$ 
+(entre la columnas 1 y $a_2$) y los que están en las columnas 1 a $a_1$ 
+(entre las filas 1 y $c_2$), podemos restar entonces $T_{c_1,a_2}$ y $T_{c_2,a_1}$. 
+
+\begin{equation}
+T_{c_2,a_2} - T_{c_1,a_2} - T_{c_2,a_1} = \sum\limits_{i = 1}^{c_2} \sum\limits_{j = 1}^{a_2} M_{i,j} - \sum\limits_{i = 1}^{c_1} \sum\limits_{j = 1}^{a_2} M_{i,j} - \sum\limits_{i = 1}^{c_2} \sum\limits_{j = 1}^{a_1} M_{i,j}
+\end{equation}
+
+\begin{equation}
+T_{c_2,a_2} - T_{c_1,a_2} - T_{c_2,a_1} = \sum\limits_{i = c_1+1}^{c_2} \sum\limits_{j = a_1+1}^{a_2} M_{i,j} - \sum\limits_{i = 1}^{c_1} \sum\limits_{j = 1}^{a_1} M_{i,j} 
+\end{equation}
+
+Nuevamente nos pasa algo similar a cuando hacíamos el precómputo de la tabla $T$, 
+ahora tenemos una sección de elementos que estamos restando dos veces, que es el 
+rectángulo que va hasta $(c_1,a_1)$. Pero sabemos que esta sección la tenemos calculada 
+en $T_{c_1,a_1}$, así que podemos sumarla al resultado que teníamos antes, para evitar 
+restarla dos veces. Entonces tenemos: 
+
+\begin{equation}
+T_{c_2,a_2} - T_{c_1,a_2} - T_{c_2,a_1} + T_{c_1,a_1} = \sum\limits_{i = c_1+1}^{c_2} \sum\limits_{j = a_1+1}^{a_2} M_{i,j}
+\end{equation}
+
+que es exactamente el resultado que buscábamos. 
+
+El algoritmo para responder las queries sería el siquiente entonces 
+
+
+\begin{algorithm}[H]
+\For{cada query $(c_1, a_1, c_2, a_2)$}{
+	\Return $T_{c_2,a_2} - T_{c_1,a_2} - T_{c_2,a_1} + T_{c_1,a_1}$\;
+}
+\caption{Proceso de las queries}
+\end{algorithm}
+
+Así responder cada query tiene complejidad constante porque solo hacemos 
+una cantidad de operaciones aritméticas. En total, responder $Q$ queries tendrá 
+complejidad $\bigO(Q)$. \\
+
+En total, todo el algoritmo tiene la complejidad del precómputo más el costo de 
+responder las queries, o sea $\bigO(AC + Q)$, como queríamos. 
 
 \newpage
 \subsection{Código de la solución}
