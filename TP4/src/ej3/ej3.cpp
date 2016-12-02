@@ -102,28 +102,28 @@ int main() {
             }
         }}}
         
-        tint MAXP = 0;
+        tint MAXP = min(2, H);
         // Lo ultimos 2 puntos no podran ser pivot, porque no podran formar triangulos.
         forn(pivot,H-2){
             // Tomamos los puntos siguientes al pivot (que son los que estan mas abajo y derecha)
             // Los ordenamos por angulo relativo a pivot
-            vector<tint> siguientes;
-            forsn(i,pivot+1,H) siguientes.push_back(i);
-            sort(siguientes.begin(), siguientes.end(), bind(comparadorMenorAnguloPivot, placeholders::_1, placeholders::_2, pivot, puntosBuenos));
+            vector<tint> sigs;
+            forsn(i,pivot+1,H) sigs.push_back(i);
+            sort(sigs.begin(), sigs.end(), bind(comparadorMenorAnguloPivot, placeholders::_1, placeholders::_2, pivot, puntosBuenos));
             
             // Ahora vemos que triangulos son adyacentes entre si, en funcion 
             // de que sean ambos validos, compartan el punto intermedio y formen un 
             // poligono convexo. 
-            tint ss = siguientes.size();
+            tint ss = sigs.size();
             memset(triangulosAdyacentes, false, sizeof(triangulosAdyacentes));
             forn(i,ss){
                 forsn(j,i+1,ss){
-                    if(!trianguloValido[pivot][i][j]) continue;
+                    if(!trianguloValido[pivot][sigs[i]][sigs[j]]) continue;
                     forsn(k,j+1,ss){
-                        if(!trianguloValido[pivot][j][k]) continue;
-                        Pto pi = puntosBuenos[i];
-                        Pto pj = puntosBuenos[j];
-                        Pto pk = puntosBuenos[k];
+                        if(!trianguloValido[pivot][sigs[j]][sigs[k]]) continue;
+                        Pto pi = puntosBuenos[sigs[i]];
+                        Pto pj = puntosBuenos[sigs[j]];
+                        Pto pk = puntosBuenos[sigs[k]];
                         if(esConvexo(pi,pj,pk)) triangulosAdyacentes[i][j][k] = true;
                     }
                 }
@@ -132,8 +132,8 @@ int main() {
             memset(dpTriangulos, 0, sizeof(dpTriangulos));
             forn(i,ss){
                 forsn(j,i+1,ss){
-                    if(!trianguloValido[pivot][i][j]) continue;
-                    dpTriangulos[i][j] = 3 + puntajeTriagunlos[pivot][i][j];
+                    if(!trianguloValido[pivot][sigs[i]][sigs[j]]) continue;
+                    dpTriangulos[i][j] = 3 + puntajeTriagunlos[pivot][sigs[i]][sigs[j]];
                     forn(k,i){
                         if(triangulosAdyacentes[k][i][j])
                             dpTriangulos[i][j] = max(dpTriangulos[i][j], dpTriangulos[k][i] + 1 + puntajeTriagunlos[pivot][i][j]);
