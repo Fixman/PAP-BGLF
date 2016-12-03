@@ -1,0 +1,252 @@
+\newpage{}
+\section{Problema D: Dif\'icil de convencer}
+\textbf{Peso del ejercicio: 9 }
+
+\newcommand{\mappend}{\operatorname{\bullet}}
+\newcommand{\mempty}{\mathbf{\varepsilon}}
+\newcommand{\sizeV}{\left|V\right|}
+\newtheorem{prop}{Proposici\'on}
+\newtheorem{lema}{Lema}
+
+\subsection{Entendiendo el problema}
+	El enunciado nos pide que dada una permutaci\'on $P$ de $N$ elementos, 
+digamos de cuantas formas pueden ser los resultados de las 
+competencias tal que al final la tabla de resultados quede igual. Como
+todos los equipos compiten contra todos en un principio tenemos un grafo
+completo y luego si el $i$-esimo equipo le gano a $j$-esimo le asignamos 
+la direccion $i->j$ a la arista que une el nodo $i$ con el $j$. 
+
+
+	Toda configuraci\'on es representable de esta
+manera , esto se conoce como grafo torneo, y todo grafo torneo se corresponde
+con un resultado de una competencia. Luego si queremos que al
+permutar los elementos bajo $P$ obtengamos un grafo isomorfo lo que necesitamos
+es que $i->j$ entonces $P(i)>P(j)$. Reciprocamente si un grafo torneo
+cumple que bajo la permutacion $P$ se mantiene invariante entonces
+ese resultado de la competencia cumple lo requerido por el enunciado. Asi 
+que veamos cuantos grafos torneo cumplen esto.
+
+\paragraph{Notacion y aclaraciones:} P es una permutacion y aveces tambien
+representa al grafo torneo sobre el cual actua. Notaremos aveces T al grafo
+torneo y N a la cantidad de elementos de P.
+
+
+\subsection{Ciclos pares, no los recomiendo}
+	\begin{prop}\label{ciclopar} 
+		Sea $P$ un ciclo de longitud par, entonces afirmo que no hay grafo 
+torneo que se mantenga invariante por $P$.
+	\end{prop}
+	\begin{proof}
+		Supongamos que existe $T$ grafo torneo invariante por $P$. Sin perdida de
+generalidad podemos suponer que $|T|=N$, pues sino consideramos el subgrafo
+torneo de $T$ afectado por $P$. Mas aun supongamos que
+$P=(2,3,4,\dots , N, 1)$, pues sino renombro los nodos.
+
+	
+		Si $N=2k>2$ entonces sin perdida de generalidad $(1,1+k) \in E$. Luego
+como $T$ es invariante por $P$ se sigue que 
+$(k+1,1) = (P^k(1),P^k(k+1)) \in E$, lo cual es absurdo. 
+	\end{proof}
+	
+		
+	Si $P=P_1P_2\dots P_k$ la descomposicion de una permutacion en ciclos
+disjuntos, entonces si alguno de los $P_i$ es un ciclo par de [\ref{ciclopar}] 
+se deduce que no hay ningun grafo torneo invariante por P. Pues si asi
+fuese el subgrafo torneo afectado por $P_i$ seria un grafo torneo 
+invariante por $P_i$ lo cual es absurdo por [\ref{ciclopar}].
+	
+\subsection{Que onda los ciclos impares?}
+	En esta secci\'on analizamos que pasa con los ciclos impares de una
+permutaci\'on.
+
+
+	\begin{lema}\label{cicloimpar}
+		Sea $P$ un ciclo impar de longitud $N=2k+1$ entonces hay $2^k$ 
+grafos torneo invariantes por $P$.
+	\end{lema}
+	\begin{proof}
+		Fijada la direcci\'on de una arista, por ejemplo, $(1,2)\in E$
+se sigue que tras aplicar consecutivamente $P$ a $(1,2)$ ,como el grafo es invariante
+por $P$, estas aristas heredan la orientaci\'on dada por $(1,2)$,
+es decir, $(P^s(1),P^s(2))\in E$ $\forall s$. 
+
+
+		Luego considero la relaci\'on de equivalencia en $E$ dada por 
+$(i,j)\sim (i',j')$ $\Leftrightarrow$ $\exists$ $s$ tal que 
+$(P^s(i),P^s(j))=(i',j')$. Luego los elementos libres vienen dados por 
+$E/\sim$ que son exactamente $\binom{N}{2}/N = (N-1)/2 = (2k+1-1)/2=k$, pues cada
+clase de equivalencia tiene $N$ elementos y el numero de aristas en un
+grafo torneo de $N$ elementos es $\binom{N}{2}$. Cada una de estas aristas 
+puedo ser orientada de 2 formas por lo que el numero de grafos torneos 
+distintos es $2^k$
+	\end{proof}
+	
+	\begin{lema}\label{aristaciclos}
+	Sea $P=P_1P_2$ una permutaci\'on compuesta por dos ciclos de longitud
+$N_1$ y $N_2$ respectivamente, sin perdida de generalidad los ciclos son 
+impares [\ref{ciclopar}]. Entonces la cantidad de maneras de dirigir las 
+aristas de $P_1$ a $P_2$ es 
+	\begin{equation}2^{mcd(N_1,N_2)}\end{equation}
+	\end{lema}
+	\begin{proof}
+		Sean $a \in P_1$, $a' \in P_2$ y sin perdida de generalidad 
+$(a,a')\in E$. Como $T$ es invariante por $P$ se sigue que $(P^s(a),P^s(a')) \in E$
+$\forall s$, es decir, $(P_1^s(a),P_2^s(a'))\in E$ $\forall s$. Entonces
+me restringo al conjunto de aristas que conectan $P_1$ con $P_2$, lo llamo
+$E_t=\{ (i,i')\in E / i\in P_1, i'\in P_2 \}$ y alli tomo la
+relacion de equivalencia dada por $(i,i')\sim(j,j') \iff \exists$ $s$ tal que
+$(i,i')=(P_1^s(j),P_2^s(j'))$, observar que $|E_t|=N_1N_2$. 
+
+
+		La cantidad de elementos en una clase de equivalencia viene dada por el 
+minimo com\'un multiplo entre $N_1$ y $N_2$. Pues si $s_0$ es el m\'inimo 
+$s$ tal que $(i,i')=(P^s(i),P^s(i'))$ entonces $i=P^{s_0}(i)$ y $i'=P^{s_0}(i')$, 
+como $P_1$ es un ciclo de longitud $N_1$ se sigue que $N_1|s_0$ y 
+$P_2$ es un ciclo de longitud $N_2$ entonces $N_2|s_0$. Entonces $mcm(N_1,N_2)|s_0$
+, luego $mcm(N_1,N_2)\leq s_0$ y como $i=P_1^{mcm(N_1,N_2)}(i)$ y $i'=P_2^{mcm(N_1,N_2)}(i')$
+por la minimalidad de $s_0$ se tiene que $s_0=mcm(N_1,N_2)$.
+
+
+		Finalmente la cantidad de aristas libres son los elementos de 
+$E_t/\sim$ que es $\frac{N_1N_2}{mcm(N_1,N_2)}=mcd(N_1,N_2)$. Como cada
+arista la puedo orientar de dos maneras distintas se sigue que la cantidad
+total de grafot torneo distintos es $2^{mcd(N_1,N_2)}$.
+	\end{proof}
+	
+	\begin{prop}
+	Sea $P=P_1\dots P_r$ una permutaci\'on compuesta por ciclos,
+sin perdida de generalidad los ciclos son impares [\ref{ciclopar}]. Si
+la longitud del ciclo $P_i$ es $N_i=2k_i+1$ entonces la cantidad de 
+grafos torneo invariantes por $P$ es:
+	\begin{equation}
+		2^{\sum_{i=1}^{r}k_i + \sum_{1\leq i<j\leq r}^{}mcd(N_i,N_j)}
+	\end{equation}
+	\end{prop}
+	\begin{proof}
+		Hacemos induccion en r:
+		\begin{itemize}
+			\item si $r=2$, $E=E_1\cup E_2\cup E_{1,2}$ union disjunta ,donde 
+$E_k=\{(i,j)\in E/ i,j \in P_k \}$ para $k=1,2$ y 
+$E_{1,2} =\{(i,i')\in E / i\in P_1 , i'\in P_2 \}$. Consideramos 
+ademas las relaciones de equivalencia definidas en [\ref{cicloimpar}] para 
+$E_1$ y $E_2$ y en [\ref{aristaciclos}] para $E_{1,2}$. Entonces por los
+lemas recien citados se sigue que la cantidad de grafos torneo invariantes
+es el producto, es decir,
+				\begin{equation}
+					2^{k_1+k_2+mcd(N_1,N_2)}
+				\end{equation}  
+			
+			\item si $r>2$, tomo $P'=P_1\dots P_{r-1}$, entonces por hipotesis
+inductiva tengo que la cantidad de grafos torneo invariantes por $P'$ son
+				\begin{equation}
+					2^{\sum_{i=1}^{r-1}k_i + \sum_{1\leq i<j\leq r-1}^{}mcd(N_i,N_j)}
+				\end{equation}
+luego agregando $P_r$, por si solo por [\ref{cicloimpar}] agrego $2^{k_r}$ 
+opciones. Por otro lado tengo la interacci\'on entre $P_r$ con $P_i$ ,
+lo cual agrega $2^{mcd(N_r,N_i)}$ por [\ref{aristaciclos}] $\forall i<r$.
+Juntando ambos terminos tengo que la cantidad total es la dada por la proposici\'on.
+		\end{itemize}
+	\end{proof}
+\subsection{Implementaci\'on, el despertar de la fuerza}
+	La implementacion se separa en dos partes, la primera en la cual
+identificamos los ciclos disjuntos y guardamos la cantidad de veces que
+aparece cada longitud. Una segunda parte en la cual calculamos los
+maximos divisores comunes entre todas las longitudes y hacemos el
+calculo final.
+	
+	
+	Como entrada le pasamos el arreglo dado por la permutacion.
+	% \incmargin{1em}
+	% \restylealgo{boxed}\linesnumbered
+	\begin{algorithm}
+	\SetKwInOut{Input}{input}
+	\SetKwInOut{Output}{output}
+	\caption{Identificacion de ciclos}
+	\Input{Arreglo de enteros $P$}
+	\Output{Map de enteros a enteros}
+	\BlankLine
+
+	$n\leftarrow$ longitud de P\;
+	$map<entero\rightarrow entero> apariciones$\;
+	
+	\While{Quedan elementos sin incertar}{
+		$set<enteros> ciclo\leftarrow$ algun elemento $e$ de $P$ que no se incerto todavia en ningun ciclo;\
+		
+		
+		\While{si $P[e]$ no esta en el ciclo}{
+			agregar $P[e]$ al ciclo\;
+			$e\leftarrow$ P[e]\;
+		}
+		$apariciones[\text{longitud del ciclo}]++$\;
+	}
+	return apariciones\;
+	\end{algorithm}
+	% \decmargin{1em}
+	
+	\paragraph{Para chequear la correctitud} supongamos que $P=P_1\dots P_r$
+su descomposicion en ciclos disjuntos y $N_1,\dots ,N_r$ sus correspondientes
+longitudes. Luego si $e$ es un elemento de $P_i$ entonces en $ciclo$ se va a guardar
+todos los elementos de $P_i$ hasta que se repita $e$, que justamente en ese 
+momento sale del bucle while y suma uno a esa ocurrencia de longitud.
+
+	\paragraph{La complejidad} es inmediata por la condicion del bucle
+while principal, que termina cuando no hay mas elementos para incertar
+en algun ciclo. Entonces como mucho se repite $N$ veces, si $N$ es la cantidad
+de elementos de la permutacion $P$. Internamente en cada iteracion del bucle
+hacemos operaciones con set y map que tardan $Log(N)$ entonces la complejidad total
+es $O(NLog(N))$;
+
+	
+	Como entrada le pasamos el map(entero,entero) previamente calculado.
+	% \incmargin{1em}
+	% \restylealgo{boxed}\linesnumbered
+	\begin{algorithm}
+	\SetKwInOut{Input}{input}
+	\SetKwInOut{Output}{output}
+	\caption{Calculo de grafos invariantes}
+	\Input{Map(entero,entero) $apariciones$}
+	\Output{Entero}
+	\BlankLine
+		
+		$total\Leftarrow$ 1\;
+
+		\For{\textbf{each} $longitud_1$ y $longitud_2$ distintas en $apariciones$}{
+			$total*=2^{apariciones[longitud_1]*apariciones[longitud_2]*mcd(longitud_1,longitud_2)}$\;
+		}
+	
+		\For{\textbf{each} $longitud=2k+1$ en $apariciones$}{
+			$total*=2^{apariciones[longitud]k}$\;
+		}
+				
+		return total;
+	\end{algorithm}
+	% \decmargin{1em}
+	
+	\paragraph{La correctitud} es inmediata por las proposiciones anterios,
+el primer bucle for agrega las opciones dadas por las aristas entre los
+ciclos. El segundo for agrega las opciones dadas por los mismos ciclos.
+	\paragraph{Para analizar la complejidad} hay que pensar cuantos
+numeros distintos impares puede haber que sumen $N$, pues como los ciclos
+son impares y la suma de todas las longitudes es la longitud de $P$ entoces
+esto daria una cota para ambos bucles, ya que el primero es cuadratico
+en este numero y el segundo es lineal. Para ello hagamos el siguiente 
+razonamiento, $N=\sum_{i=1}^{r}2k_i+1$, como quiero maximizar $r$ entonces
+supongo que los $K_i$ empiezan desde $1$, entonces\\
+\begin{math}
+	N=\sum_{i=1}^{r}2i+1=2\sum_{i=1}^{r}k_i+r=2\frac{r(r+1)}{2}+r=r^2+2r
+\end{math}\\
+	De alli se despeja $r=-1+\sqrt{1+N}$.
+	
+	
+	Luego el primer bucle for se repite $O(N)$ veces y el segundo $O(sqrt(N))$
+veces. Ademas en el primero tenemos una potenciacion usando potenciacion
+logaritmica la resolvemos en $O(log(apariciones[longitud_1]*apariciones[longitud_2]*mcd(longitud_1,longitud_2)))\leq O(log(N))$ y el mcd
+tarda tambien $O(log(longitud_1)+log(longitud_2))\leq O(log(N))$. Por lo que el primer for
+finalmente tarda $O(NLog(N))$ y el segundo $O(sqrt(N)Log(N))$
+
+	\paragraph{Finalmente la complejidad} del problema esta acotada
+por $O(NLog(N))$ como pedia el enunciado.
+
+\subsection{Código de la solución}
+\lstset{inputencoding=utf8/latin1}
+\lstinputlisting[numbers = left]{../src/ej4/ej4.cpp}
