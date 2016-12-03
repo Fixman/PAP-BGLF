@@ -102,6 +102,7 @@ int main() {
             }
         }}}
         
+        // Calculo de la solucion: 
         tint MAXP = min(2, H);
         // Lo ultimos 2 puntos no podran ser pivot, porque no podran formar triangulos.
         forn(pivot,H-2){
@@ -109,39 +110,69 @@ int main() {
             // Los ordenamos por angulo relativo a pivot
             vector<tint> sigs;
             forsn(i,pivot+1,H) sigs.push_back(i);
+            // Ordenamos los indices de los puntos en funcion del angulo que forman con el pivot
             sort(sigs.begin(), sigs.end(), bind(comparadorMenorAnguloPivot, placeholders::_1, placeholders::_2, pivot, puntosBuenos));
             
             // Ahora vemos que triangulos son adyacentes entre si, en funcion 
             // de que sean ambos validos, compartan el punto intermedio y formen un 
             // poligono convexo. 
+            // Para todo par de puntos, que formen un triangulo valido, 
+            // tomamos un tercer punto que forme un triangulo valido con el segundo punto, 
+            // y si los tres puntos forman un angulo convexo, entonces los 
+            // triangulos son adyacentes. Complejidad O(N^3).
             tint ss = sigs.size();
             memset(triangulosAdyacentes, false, sizeof(triangulosAdyacentes));
             forn(i,ss){
+                int idxPi = sigs[i];
+                
                 forsn(j,i+1,ss){
-                    if(!trianguloValido[pivot][sigs[i]][sigs[j]]) continue;
+                    int idxPj = sigs[j];
+                    if(!trianguloValido[pivot][idxPi][idxPj]) continue;
+                    
                     forsn(k,j+1,ss){
-                        if(!trianguloValido[pivot][sigs[j]][sigs[k]]) continue;
-                        Pto pi = puntosBuenos[sigs[i]];
-                        Pto pj = puntosBuenos[sigs[j]];
-                        Pto pk = puntosBuenos[sigs[k]];
+                        int idxPk = sigs[k];
+                        if(!trianguloValido[pivot][idxPj][idxPk]) continue;
+                        
+                        Pto pi = puntosBuenos[idxPi];
+                        Pto pj = puntosBuenos[idxPj];
+                        Pto pk = puntosBuenos[idxPk];
                         if(esConvexo(pi,pj,pk)) triangulosAdyacentes[i][j][k] = true;
                     }
                 }
             }
-            // Dinamica
+            // Dinamica: 
+            // Para cada triangulo formado por (pivot,i,j) calculamos el mejor 
+            // puntaje acumulado que puede tener si ese es el ultimo triangulo. 
+            // Para eso, tomamos todo otro triangulo (pivot,k,i) que vaya antes y 
+            // que sea adyacente con (pivot,i,j), y la solucion de (pivot,i,j) 
+            // sera el maximo entre su puntaje (+3), o su puntaje (+1) mas la solucion 
+            // de (pivot,k,i). 
+            // Cuando iteramos k, lo hacemos sobre los puntos anteriores a i (o sea, 
+            // estan antes segun el angulo), de modo que sus soluciones ya fueron calculadas. 
+            // Complejidad O(N^3).
             memset(dpTriangulos, 0, sizeof(dpTriangulos));
             forn(i,ss){
+                int idxPi = sigs[i];
+                
                 forsn(j,i+1,ss){
-                    if(!trianguloValido[pivot][sigs[i]][sigs[j]]) continue;
-                    dpTriangulos[i][j] = 3 + puntajeTriagunlos[pivot][sigs[i]][sigs[j]];
-                    forn(k,i){
+                    int idxPj = sigs[j];
+                    if(!trianguloValido[pivot][idxPi][idxPj]) continue;
+                    
+                    tint puntajePivotIJ = puntajeTriagunlos[pivot][idxPi][idxPj];
+                    dpTriangulos[i][j] = 3 + puntajePivotIJ;
+                    
+                    forn(k,i)
                         if(triangulosAdyacentes[k][i][j])
-                            dpTriangulos[i][j] = max(dpTriangulos[i][j], dpTriangulos[k][i] + 1 + puntajeTriagunlos[pivot][i][j]);
-                    }
+                            dpTriangulos[i][j] = max(dpTriangulos[i][j], dpTriangulos[k][i] + puntajePivotIJ + 1);
+                    
                     MAXP = max(MAXP, dpTriangulos[i][j]);
                 }
             }
         }
+        // Cada iteracion de pivot lleva O(N^3), por tanto todo este proceso es O(N^4). 
+        
+        // Sumado al preproceso que era O(N^4), en total el algoritmo tiene 
+        // complejidad O(N^4). 
         cout << MAXP << endl;
     }
     return 0;
