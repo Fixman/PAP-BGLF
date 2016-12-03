@@ -108,7 +108,7 @@ int main() {
     tint MAXP = min(2, H);
     // Ultimos 2 puntos no pueden ser pivot, no podran formar triangulos.
     forn(pivot,H-2){
-      // Tomamos los puntos siguientes al pivot (que estan mas abajo y derecha).
+      // Tomamos los puntos siguientes al pivot (que estan mas abajo)
       // Los ordenamos por angulo relativo a pivot
       vector<tint> sigs;
       forsn(i,pivot+1,H) sigs.push_back(i);
