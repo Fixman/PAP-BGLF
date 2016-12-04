@@ -94,6 +94,7 @@ double shufflingOdds(AccumulatingStack &p)
 	if (p.empty())
 		return 0;
 
+	// s / a - 1 = (s - a) / a
 	double s = p.sum();
 	double a = p.pop();
 	return s / a - 1 + shufflingOdds(p);

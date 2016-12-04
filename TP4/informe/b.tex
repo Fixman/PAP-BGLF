@@ -94,6 +94,23 @@ Es importante darse cuenta que, gracias al paso 2, siempre se va a permutar el a
 
 La complejidad final es \(\bigO(N \log N + N) = \bigO(N \log N)\).
 
+\subsection{Casos de Prueba}
+
+\begin{tabulary}{\textwidth}{L l l}
+\toprule
+\textbf{Caso de prueba} & \textbf{Archivo de entrada} & \textbf{Salida esperada} \\
+\midrule
+& \lstinputlisting[basicstyle=\footnotesize]{../src/ej2/ej2_a.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej2/ej2_a.out} \\
+Casos de prueba chicos hechos a mano & \lstinputlisting[basicstyle=\footnotesize]{../src/ej2/ej2_b.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej2/ej2_b.out} \\
+& \lstinputlisting[basicstyle=\footnotesize]{../src/ej2/ej2_c.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej2/ej2_c.out} \\
+\midrule
+Todos los elementos son iguales & \lstinputlisting[basicstyle=\footnotesize]{../src/ej2/ej2_equal.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej2/ej2_equal.out} \\
+\midrule
+Hay muchos valores (algunos de los cuales repetidos) & \textit{ej2\_grande.in} & \lstinputlisting[basicstyle=\footnotesize]{../src/ej2/ej2_grande.out} \\
+\bottomrule
+\end{tabulary}
+
+\newpage
 \subsection{Código de la solución}
 \lstset{inputencoding=utf8/latin1}
-%\lstinputlisting[numbers = left]{../src/ej2/ej2.cpp}
+\lstinputlisting[numbers = left]{../src/ej2/ej2.cpp}
