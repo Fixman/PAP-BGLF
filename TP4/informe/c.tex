@@ -1,5 +1,5 @@
 \newpage{}
-\section{Problema C: }
+\section{Problema C: Construyendo murallas}
 \textbf{Peso del ejercicio: 10}
 
 \subsection{Descripción del problema}
@@ -19,15 +19,15 @@ el polígono marcado con líneas, cuyo valor sería X.
 
 Siendo $N = H + E$, se nos pide encontrar un algoritmo que sea polinomial, en el mejor 
 de los casos con complejidad temporal $O(N^5)$ u $O(N^4)$. Se asume además que no existirán 
-tres puntos alineados en la entrada. 
+tres puntos alineados en la entrada. \\
 
-\subsection{Solución propuesta}
+\textbf{Solución propuesta}
 
 La solución que proponemos tiene complejidad temporal de $O(N^4)$, se basará fuertemente 
 en la utilización de triángulos. Para empezar, enunciamos algunas propiedades y observaciones 
 útiles que serán importantes para entender la solución. 
 
-\subsubsection{Observaciones importantes}
+\subsection{Observaciones importantes}
 % triangulacion, triangulos faciles
 \begin{itemize}
 \item El polígono que debemos hallar es un polígono convexo, sabemos que todo 
@@ -44,8 +44,7 @@ cae dentro o fuera del triángulo (más adelante daremos detalles de esto). Esta
 hecho que sea simple, nos ayudarán con el algoritmo. 
 \end{itemize}
 
-\subsubsection{Algoritmo}
-% mas dibujitos
+\subsection{Explicación del algoritmo}
 Usando estas observaciones construiremos nuestro algoritmo. La idea del mismo tiene elementos similares 
 con el algoritmo de Graham para hallar una cápsula convexa dados un conjunto de puntos. \\
 
@@ -65,25 +64,54 @@ De modo que todo este preproceso puede hacerse en $O(N^4)$.\\
 
 \textbf{Cálculo de la solución}
 
-La idea será, tomar un punto cualquiera que supondremos será el \textit{pivote} 
+Tomamos un punto cualquiera que supondremos será el \textit{pivote} 
 del polígono de nuestra solución. Con el resto de los puntos, trateremos de formar polígonos 
-convexos usando triángulos que usen el \textit{pivote} como vértice. 
+convexos usando triángulos que usen el \textit{pivote} como vértice. Como tenemos fijo uno 
+de los puntos (el \textit{pivote}) hay en total $O(N^2)$ triángulos sobre los que iterar. 
+Para facilitar el chequeo de que los polígonos resultantes sean convexos, 
+sólo tomaremos puntos que se encuentren más abajo que el \textit{pivote}.
 
+Entonces, el algoritmo va recorriendo los triángulos (o bien, los 2 puntos que formarían el triángulo 
+con el \textit{pivote}) en orden según el ángulo que forman con el \textit{pivote}. De esta forma, 
+se puede plantear un algoritmo de programación dinámica que calcula, para cada triángulo $T$ que 
+usa el \textit{pivote}: cuál es el mejor puntaje acumulado que se puede lograr armando 
+un polígono convexo (y sin puntos malos), si el último triángulo que se agrega al polígono 
+es $T$. Llamamos a este valor \texttt{dp[T]}.
 
+Para calcular esto para todo triángulo $T$, debemos tener calculado previamente también 
+\texttt{dp[T']} para los $T'$ triángulos que se encuentren antes según el ángulo con el 
+\textit{pivote}, donde $T'$ sería el anteúltimo triángulo del polígono (justo antes que $T$). 
+Es por esto que recorremos los triángulos en orden en algún sentido (horario u 
+antihorario), cuando querramos calcular \texttt{dp[T]} tendremos calculado ya el valor de los triángulos 
+anteriores. 
 
-Para facilitar el chequeo de 
-que los polígonos resultantes sean convexos, sólo tomaremos puntos que se encuentren más abajo que el 
-\textit{pivote} (de este modo ...)
+Es claro que como $T'$ debe ir inmediatamente antes que $T$, no cualquier triángulo puede 
+servir como $T'$, debe cumplir entonces que: 
+\begin{itemize}
+\item $T'$ debe ser \textit{adyacente} a $T$, en el sentido que debe compartir un lado, de manera 
+que los triángulos se ``peguen bien''. Dicho de otra forma, si $T$ está formado por los puntos $i$ y $j$ 
+(con $i$ antes que $j$ según el \textit{pivote}), entonces $T'$ debe estar formado por $k$ e $i$ 
+(con $k$ antes que $i$). 
+\item Siempre los triángulos que miramos, tanto $T$ como $T'$ deben ser \textit{válidos} (no 
+contener puntos malos). 
+\item Se debe mantener la convexidad del polígono. Para esto, basta con mirar (similar a cómo 
+funciona el algoritmo de Graham) que los puntos $k$, $i$ y $j$ formen un ángulo convexo (menor a 180 grados). 
+De esta forma, todos los ángulos interiores del polígono resultante serán menores a 180 grados, y 
+por tanto el polígono será convexo. 
+\end{itemize}
 
+% TODO dibujo aqui con explicacion
+
+\subsection{Pseudocódigo}
 
 \textbf{Correctitud del algoritmo}\\
 
-\subsubsection{Detalles sobre la implementación}
+\subsection{Detalles sobre la implementación}
 % diferencia entre N^4 y N^5, como hacerlo 
 % explicar el bind? 
 % que los puntos tienen coordenadas enteras nomas
 
-\subsubsection{Análisis de complejidad}
+\subsection{Análisis de complejidad}
 % ganar
 
 \newpage
