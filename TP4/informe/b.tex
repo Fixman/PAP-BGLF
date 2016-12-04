@@ -1,9 +1,99 @@
 \newpage{}
-\section{Problema B:  }
+\section{Problema B:\@ Bien Ordenado}
 \textbf{Peso del ejercicio: }
 
+\newcommand{\aiN}{\(A_{i\dots{}N}\)}
+\newcommand{\pop}{\operatorname{pop}}
+\newcommand{\nicesum}[1]{\sum\nolimits^{\left|#1\right|}_{i = 1}{#1_i}}
 
-\newpage
+\definecolor{darkgray}{gray}{0.2}
+\newcommand{\smol}[1]{\tag*{\parbox{8em}{\textcolor{darkgray}{\small{#1}}}}}
+
+El cuerpo del algoritmo del programa presentado en el problema está separado en cuatro casos diferentes.
+
+\begin{enumerate}
+	\item Comenzar con \(i = 0\) un arreglo \(A\) de tamaño \(N\).
+	\item Permutar al azar el arreglo \aiN{}.
+	\item Mientras \(i\) sea menor a \(N\) y el menor elemento de \aiN{} sea \(A_i\), incrementar \(i\) en 1.
+	\item Si \(i < N\), volver al paso 2.
+\end{enumerate}
+
+Podemos ver que la única condición, ver si \aiN{} tiene \(A_i\) como menor elemento, está en el paso 3. Por lo tanto, el único caso del arreglo que importa además de su tamaño es si se cumple esta propiedad.
+
+\subsection{Transformación del arreglo de entrada}
+
+Por simplicidad del problema, queremos transformar el arreglo \(A\) de entrada en un arreglo \(T\) que permita resolver el problema, pero que contenga la menor cantidad de información posible.
+
+Como el paso 2, que se cumple inmediatamente antes de la condición del paso 3 permuta totalmente el arreglo, la posición del menor elemento de \aiN{} es irrelevante. Lo único sobre esto que sí es relevante es la probabilidad de que aparezca \(A_i\) dentro de este rango. Como esto esta solo relacionado con la cantidad de veces que aparece en el arreglo, podemos ver que \textbf{cada número y en qué lugar aparece son irrelevantes}.
+
+En particular, tenemos que conocer solamente.
+
+\begin{itemize}
+	\item El tamaño total de \(A\).
+	\item La cantidad de veces en las que aparece cada número (sin importar cuál es).
+	\item El orden lexicográfico de los números.
+\end{itemize}
+
+Una manera de representar el arreglo \(T\) es como un arreglo con la frecuencia de cada número, ordenado por su orden lexicográfico. De esta manera, definimos la función \(G\) tal que
+
+\begin{align*}
+	G \left(\left[2, 3, 1\right]\right) = \left[1, 1, 1\right] \smol{Todos los valores igual de frecuentes.} \\
+	G \left(\left[4, 8, 15\right]\right) = \left[1, 1, 1\right] \smol{No importan los valores exactos.} \\
+	G \left( \left[3, 4, 2, 1, 2, 3\right]\right) = \left[1, 2, 2, 1\right] \smol{Sí nos importan las frecuentias, y los ordenes lexicográficos.}
+\end{align*}
+
+Una manera simple de definir un algoritmo que haga la función \(G\) es ordenando el arreglo y plegarlo\footnote{``Plegar'' es una terrible traducción de \textit{fold}}, acumulando un arreglo al último valor hasta llegar al final. Otra manera es usar una estructura de datos que mantenga el orden lexicográfico de los elementos y permita buscarlos rapidamente, como un red-black tree (\textit{map} de C++). En nuestro código elegimos la segunda, aunque todas las formas tienen complejidad temporal \(\bigO(N \log N)\).
+
+\subsection{Cálculo de esperanza}
+
+Una vez que tenemos el arreglo \(T\), debemos calcular la esperanza de la cantidad de permutaciones que se deben hacer hasta terminar todo el arreglo.
+
+Para simplificar la notación, definimos la función \(\pop\), que cumpla con la siguiente propiedad asumiendo que \(s\) es el elemento más chico de \(A\).
+
+\[
+	G\left(A \backslash s\right) = \pop\left(G\left(A\right)\right)
+\]
+
+Eso es, hacer \(\pop\) al arreglo \(T\) es el equivalente a eliminar el elemento más chico del arreglo \(A\). Esto se puede implementar en tiempo constante de manera simple.
+
+\begin{align*}
+	\pop\left(\left[0, b_1, \dots, b_n\right]\right) &= \left[b_1, \dots, b_n\right] \\
+	\pop\left(\left[a, b_1, \dots, b_n\right]\right) &= \left[a - 1, b_1, \dots, b_n\right] \smol{Cuando \(a > 0\).}
+\end{align*}
+
+Con esto se puede definir la función \(E(T)\) como este valor, y debería cumplir las siguientes propiedades.
+
+\begin{align*}
+	E \left(\left[\right]\right) &= 0 &\smol{No hay permutaciones en un arreglo vacío} \\
+	E \left(A\right) &= \begin{aligned} P(\text{Sale menor}) &\cdot E\left(\pop\left(A\right)\right) \\ + \, P(\text{Sale otro}) &\cdot (1 + E(A)) \end{aligned} &\smol{Se permuta si no salió lo esperado.}
+\end{align*}
+
+En este caso, ``\textit{Sale menor}'' y ``\textit{Sale otro}'' indican que, si se elige un elemento al azar en \aiN, este va a ser igual al menor del rango. Usando probabilidad simple,
+
+\[
+	P(\text{Elemento elegido es t}) = \frac{\text{Cantidad de veces que aparece t}}{\text{Cantidad de elementos totales}}
+\]
+
+Ya guardamos en \(T\) la cantidad de veces que aparece el menor elemento (\(T_0 = a\)), y la cantidad de elementos totales (\(\nicesum{T}\)).
+
+Por ende, la fórmula final para el segundo caso va a ser la siguiente.
+
+\begin{align*}
+T &= \left[a, b_1, \dots, b_n\right] \\
+y &= P\left(\text{Sale menor}\right) = \frac{a}{a + \nicesum{b}} &\smol{El menor siempre es el primer elemento} \\
+& \\
+E\left(T\right) &= y \cdot E \left(\pop\left(T\right)\right) + \left(1 - y\right) \cdot \left(1 + E\left(T\right)\right) \\
+y \cdot E\left(T\right) &= y \cdot E \left(\pop\left(T\right)\right) + \left(1 - y\right) \\
+E\left(T\right) &= E\left(\pop\left(T\right)\right) + \frac{1}{y} - 1 \\
+&= E\left(\pop\left(T\right)\right) + \frac{\nicesum{b}}{a} \\
+\end{align*}
+
+Esta fórmula nos da una manera simple de calcular la esperanza del arreglo \(T\). Si se precomputan los sucesivos valores de \(\nicesum{b}\), que se puede hacer con espacio constante porque la suma tiene una operación opuesta, la complejidad de calcular esta esparanza es \(\bigO(N)\).
+
+Es importante darse cuenta que, gracias al paso 2, siempre se va a permutar el arreglo por lo menos una vez. Por lo tanto, la respuesta final dado un arreglo \(A\) es \(E\left(G\left(A\right)\right) + 1\).
+
+La complejidad final es \(\bigO(N \log N + N) = \bigO(N \log N)\).
+
 \subsection{Código de la solución}
 \lstset{inputencoding=utf8/latin1}
 %\lstinputlisting[numbers = left]{../src/ej2/ej2.cpp}
