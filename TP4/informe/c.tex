@@ -211,7 +211,21 @@ puede hacerse en tiempo constante de esta forma.
 
 \subsection{Análisis de complejidad}
 % ganar
+Podemos ver en base a los pseudocódigos, y dado que ya vimos que chequear ángulos 
+o pertenecia de un punto en un triángulo lleva tiempo constante, que todo el preproceso 
+del algoritmo tiene complejidad $O(N^4)$, porque iteramos sobre todas las ternas de puntos que son 
+$O(N^3)$ y para cada una vemos para cada punto $p$ si cae dentro del triángulo formado por la terna. 
 
+Luego iteramos sobre todos los pivotes, que en total son $O(N)$, ordenamos un conjunto de puntos 
+según el ángulo que forman con el pivote (como mucho son $O(N)$, por tanto esto puede hacerse 
+en $O(N log N)$). Como vimos, fijado el pivote, dados otros 2 puntos, estos forman un triángulo, 
+entonces para cada pivote hay $O(N^2)$ triángulos, además para cada uno, debemos ver cuáles triángulos 
+adyacentes a este, y usar sus soluciones para la dinámica. Como los triángulos adyacentes deben compartir 
+2 puntos (el pivote y otro más), hay en total $O(N)$ puntos para probar para los triángulos adyacentes. 
+
+El cálculo de la solución es entonces: $O(N) * O(N log N) * O(N^2) * O(N) = O(N^4)$. 
+
+Podemos ver entonces que todo el algoritmo tiene complejidad $O(N^4)$. 
 
 \newpage
 \subsection{Código de la solución}
