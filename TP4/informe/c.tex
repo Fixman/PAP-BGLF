@@ -35,7 +35,7 @@ polígono convexo admite una triangulación. En particular, también admite una 
 en la que todos las diagonales salen de un mismo vértice. Llamaremos a este vértice \textit{pivote} 
 para futuras referencias. 
 \item Dados tres puntos (y asumiendo que no habrá 3 puntos alineados), es unívoco el triángulo que se 
-forma y además es no degenerado siempre. El hecho de que sea unívoco no es cierto para polígonos más 
+forma y además no será degenerado nunca. El hecho de que sea unívoco no es cierto para polígonos más 
 grandes, y además hará más simple el algoritmo. 
 \item Queremos además encontrar un polígono convexo que contenga la mayor cantidad de puntos \textit{buenos} 
 (los lugares históricos) y que no incluya ningún punto \textit{malo} (los edificios enemigos). 
@@ -46,7 +46,10 @@ hecho que sea simple, nos ayudarán con el algoritmo.
 
 \subsection{Explicación del algoritmo}
 Usando estas observaciones construiremos nuestro algoritmo. La idea del mismo tiene elementos similares 
-con el algoritmo de Graham para hallar una cápsula convexa dados un conjunto de puntos. \\
+con el algoritmo de Graham para hallar una cápsula convexa dados un conjunto de puntos. 
+
+La idea será tratar de ir formando polígonos convexos en base a triángulos, que como vimos forman 
+una buena descomposición del polígono y simplifican varias cuestiones de cálculo geométrico. \\
 
 \textbf{Preproceso}
 
@@ -69,7 +72,7 @@ del polígono de nuestra solución. Con el resto de los puntos, trateremos de fo
 convexos usando triángulos que usen el \textit{pivote} como vértice. Como tenemos fijo uno 
 de los puntos (el \textit{pivote}) hay en total $O(N^2)$ triángulos sobre los que iterar. 
 Para facilitar el chequeo de que los polígonos resultantes sean convexos, 
-sólo tomaremos puntos que se encuentren más abajo que el \textit{pivote}.
+sólo tomaremos puntos que se encuentren más arriba que el \textit{pivote}.
 
 Entonces, el algoritmo va recorriendo los triángulos (o bien, los 2 puntos que formarían el triángulo 
 con el \textit{pivote}) en orden según el ángulo que forman con el \textit{pivote}. De esta forma, 
@@ -96,7 +99,8 @@ que los triángulos se ``peguen bien''. Dicho de otra forma, si $T$ está formad
 contener puntos malos). 
 \item Se debe mantener la convexidad del polígono. Para esto, basta con mirar (similar a cómo 
 funciona el algoritmo de Graham) que los puntos $k$, $i$ y $j$ formen un ángulo convexo (menor a 180 grados). 
-De esta forma, todos los ángulos interiores del polígono resultante serán menores a 180 grados, y 
+De esta forma (y además, como los puntos estaban por debajo del \textit{pivote}), 
+todos los ángulos interiores del polígono resultante serán menores a 180 grados, y 
 por tanto el polígono será convexo. 
 \end{itemize}
 
@@ -104,15 +108,110 @@ por tanto el polígono será convexo.
 
 \subsection{Pseudocódigo}
 
-\textbf{Correctitud del algoritmo}\\
+En el preproceso calculamos para cada triángulo si es válido, y su puntaje. 
 
-\subsection{Detalles sobre la implementación}
+\begin{algorithm}[H]
+\caption{Preproceso}
+\For{\textbf{each} terna $[i,j,k], i,j,k \in puntosBuenos$}{
+  \If{$i,j,k$ son distintos}{
+    $T \leftarrow$ triangulo formado por $[i,j,k]$\;
+    \For{\textbf{each} $p \in puntosMalos$}{
+      \If{$p$ cae dentro de $T$}{
+        marcar $T$ como no valido\;
+      }
+    }
+    \For{\textbf{each} $p \in puntosBuenos$}{
+      \If{$p$ cae dentro de $T$}{
+        puntaje[$T$]++\;
+      }
+    }      
+  }
+}
+\end{algorithm}
+
+Luego calculamos la solución iterando sobre los distintos pivotes. 
+Cuando tengamos $H \geq 2$, la respuesta será mínimo 2 porque al no haber 
+3 puntos alineados, existirá un polígono lo suficientemente chico que contenga 
+2 puntos buenos sin ninguno malo. Analogamente, siempre puede hacerse un polígono 
+con 1 solo punto bueno. Por esto, al principio del algoritmo, tomamos $R$ (la respuesta) 
+como el mínimo entre 2 y $H$. 
+
+\begin{algorithm}[H]
+\caption{Cálculo de la solución}
+$R \leftarrow min(2,H)$\;
+ordenar $puntoBuenos$ por coordenada $Y$ y luego coordenada $X$\;
+\For{\textbf{each} $pivot \in puntosBuenos$}{
+  $S \leftarrow$ puntos que están luego de $pivot$\;
+  ordenar $S$ por ángulo respecto de $pivot$\;
+  \For{\textbf{each} $i \in S$}{
+    \For{\textbf{each} $j \in S, j > i$}{
+      $T \leftarrow$ triangulo formado por $[pivot,i,j]$\;
+      \If{$T$ es válido}{
+        \For{\textbf{each} $k \in S, k > j$}{
+          $U \leftarrow$ triangulo formado por $[pivot,j,k]$\;
+          \If{$U$ es válido $\wedge$ $i,j,k$ forman un ángulo convexo}{
+            marcar $U$ y $T$ como adyacentes\;
+          }
+        }
+      }
+    }
+  }
+  \For{\textbf{each} $i \in S$}{
+    \For{\textbf{each} $j \in S, j > i$}{
+      $T \leftarrow$ triangulo formado por $[pivot,i,j]$\;
+      \If{$T$ es válido}{
+        dp[$T$] $\leftarrow$ puntaje[$T$] + 3\;
+        \For{\textbf{each} $k \in S, k < i$}{
+          $U \leftarrow$ triangulo formado por $[pivot,k,i]$\;
+          \If{$T$ y $U$ son adyacentes}{
+            dp[$T$] $\leftarrow max$(dp[$T$], dp[$U$] + puntaje[$T$] + 1)\;
+          }
+          $R \leftarrow max(R, $dp[$T$]$)$\;
+        }
+      }
+    }
+  }
+}
+\end{algorithm}
+
+\textbf{Correctitud del algoritmo}
+
+La solución al problema será el mayor puntaje de algún polígono convexo, 
+en particular por lo que vimos antes, este polígono puede tener un pivote y puede 
+ser cualquiera de sus vértices (en particular, el de más abajo como elegimos nosotros). 
+
+Además, este polígono siempre admitirá una triangulación respecto de ese pivote, y como 
+estamos considerando en la dinámica a todos los triángulos posibles salientes de ese pivote, entonces 
+siempre podremos obtener la mejor solución para un pivote dado. 
+
+Como no podemos saber a priori cuál de los puntos buenos será el verdadero pivote de la solución, 
+probamos con todos, de esta forma cubirmos todas las soluciones posibles. 
+
+\subsection{Detalles sobre el algoritmo/implementación}
+\begin{itemize}
+\item Para chequear que el ángulo formado por 3 puntos sea un ángulo convexo, usamos 
+el producto cruz, al igual que en el algoritmo de Graham para hallar la cápsula convexa. 
+Hacer este cálculo lleva tiempo constante. 
+\item Todos los puntos tienen coordenadas enteras, de modo que sus valores, y 
+las operaciones que necesitamos hacer con ellos (producto cruz, norma cuadrado) puede almacenarse 
+en enteros. 
+\item Para ordenar los puntos por ángulo formado con el pivote, también utilizamos el producto 
+cruz. 
+\item Para calcular si un punto $p$ está contenido en un triángulo $(i,j,k)$, lo que hacemos 
+es calcular el sentido (horario o antihorario) en el que están dispuestos los conjuntos de puntos 
+$(p,i,j)$, $(p,j,k)$ y $(p,k,i)$. Si y solo si los tres cálculos dan el mismo resultado, quiere 
+decir que $p$ debe estar contenido en el triángulo. Para saber si la disposición es horario o antihoraria, 
+nuevamente usamos el producto cruz. Podemos ver entonces que chequear si punto cae dentro de un triángulo 
+puede hacerse en tiempo constante de esta forma. 
+\end{itemize}
 % diferencia entre N^4 y N^5, como hacerlo 
 % explicar el bind? 
 % que los puntos tienen coordenadas enteras nomas
+% punto en triangulo 
 
 \subsection{Análisis de complejidad}
 % ganar
+
 
 \newpage
 \subsection{Código de la solución}
